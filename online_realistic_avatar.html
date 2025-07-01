@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Realistic Face Avatar - Online Version</title>
+    <meta name="description" content="Real-time face avatar using MediaPipe 3D face mesh technology">
+    <meta name="keywords" content="face avatar, mediapipe, 3D face, real-time, webcam">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        h1 {
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            font-size: 2.5em;
+        }
+        
+        .subtitle {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .video-container, .avatar-container {
+            position: relative;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            min-height: 300px;
+        }
+        
+        video, canvas {
+            display: block;
+            border-radius: 15px;
+            width: 100%;
+            height: 100%;
+            min-height: 300px;
+        }
+        
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .control-panel {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .control-panel h3 {
+            margin-bottom: 15px;
+            color: #fff;
+        }
+        
+        .expression-display {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+        
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .metric {
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.9em;
+        }
+        
+        button {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .toggle-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .toggle-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .toggle-switch.active {
+            background: #00ff00;
+        }
+        
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+        }
+        
+        .toggle-switch.active::after {
+            transform: translateX(26px);
+        }
+        
+        .status {
+            font-weight: bold;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .instructions {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+            text-align: left;
+        }
+        
+        .instructions h3 {
+            margin-bottom: 15px;
+            color: #fff;
+        }
+        
+        .instructions ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .instructions li {
+            margin: 8px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .instructions li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #00ff00;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎭 Realistic Face Avatar</h1>
+        <p class="subtitle">Real-time 3D face mesh using MediaPipe technology</p>
+        
+        <div class="main-content">
+            <div class="video-container">
+                <video id="video" width="400" height="300" autoplay muted></video>
+                <div class="status" id="status">Initializing...</div>
+            </div>
+            
+            <div class="avatar-container">
+                <canvas id="avatar" width="400" height="300"></canvas>
+                <div id="fps">FPS: 0</div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <div class="control-panel">
+                <h3>🎮 Controls</h3>
+                <button id="startBtn" onclick="startAvatar()">Start Avatar</button>
+                <button id="stopBtn" onclick="stopAvatar()" disabled>Stop Avatar</button>
+                <button id="screenshotBtn" onclick="takeScreenshot()" disabled>Screenshot</button>
+            </div>
+            
+            <div class="control-panel">
+                <h3>😊 Expression Analysis</h3>
+                <div class="expression-display" id="expression">Neutral</div>
+                <div class="metrics">
+                    <div class="metric">
+                        <div>Confidence: <span id="confidence">0%</span></div>
+                    </div>
+                    <div class="metric">
+                        <div>Landmarks: <span id="landmarkCount">0</span></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="control-panel">
+                <h3>🔧 Mesh Options</h3>
+                <div class="toggle-group">
+                    <div class="toggle-item">
+                        <span>Show Face Mesh</span>
+                        <div class="toggle-switch active" id="meshToggle" onclick="toggleMesh()"></div>
+                    </div>
+                    <div class="toggle-item">
+                        <span>3D Depth</span>
+                        <div class="toggle-switch active" id="depthToggle" onclick="toggleDepth()"></div>
+                    </div>
+                    <div class="toggle-item">
+                        <span>Realistic Colors</span>
+                        <div class="toggle-switch active" id="colorToggle" onclick="toggleColors()"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="control-panel">
+                <h3>📊 Performance</h3>
+                <div class="metrics">
+                    <div class="metric">
+                        <div>Processing: <span id="processingTime">0ms</span></div>
+                    </div>
+                    <div class="metric">
+                        <div>Memory: <span id="memoryUsage">0MB</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3>📋 How to Use</h3>
+            <ul>
+                <li>Click "Start Avatar" to begin face detection</li>
+                <li>Allow camera access when prompted by your browser</li>
+                <li>Position your face clearly in front of the camera</li>
+                <li>Watch your realistic 3D face avatar respond in real-time</li>
+                <li>Use the toggle switches to customize the display</li>
+                <li>Take screenshots to save your avatar moments</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- MediaPipe CDN Links -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+
+    <script>
+        // Global variables
+        let faceMesh;
+        let camera;
+        let isRunning = false;
+        let frameCount = 0;
+        let lastTime = performance.now();
+        let currentExpression = "neutral";
+        let expressionConfidence = 0;
+        
+        // Mesh options
+        let showMesh = true;
+        let showDepth = true;
+        let realisticColors = true;
+        
+        // DOM elements
+        const video = document.getElementById('video');
+        const avatarCanvas = document.getElementById('avatar');
+        const avatarCtx = avatarCanvas.getContext('2d');
+        const status = document.getElementById('status');
+        const fpsDisplay = document.getElementById('fps');
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const screenshotBtn = document.getElementById('screenshotBtn');
+        const expressionDisplay = document.getElementById('expression');
+        const confidenceDisplay = document.getElementById('confidence');
+        const landmarkCountDisplay = document.getElementById('landmarkCount');
+        const processingTimeDisplay = document.getElementById('processingTime');
+        const memoryUsageDisplay = document.getElementById('memoryUsage');
+        
+        // MediaPipe face mesh connections for realistic face
+        const FACE_MESH_CONNECTIONS = [
+            // Face outline
+            [10, 338], [338, 297], [297, 332], [332, 284], [284, 251], [251, 389], [389, 356], [356, 454], [454, 323], [323, 361], [361, 288], [288, 397], [397, 365], [365, 379], [379, 378], [378, 400], [400, 377], [377, 152], [152, 148], [148, 176], [176, 149], [149, 150], [150, 136], [136, 172], [172, 58], [58, 132], [132, 93], [93, 234], [234, 127], [127, 162], [162, 21], [21, 54], [54, 103], [103, 67], [67, 109], [109, 10],
+            
+            // Left eye
+            [33, 7], [7, 163], [163, 144], [144, 145], [145, 153], [153, 154], [154, 155], [155, 133], [133, 173], [173, 157], [157, 158], [158, 159], [159, 160], [160, 161], [161, 246], [246, 33],
+            
+            // Right eye
+            [362, 382], [382, 381], [381, 380], [380, 374], [374, 373], [373, 390], [390, 249], [249, 263], [263, 466], [466, 388], [388, 387], [387, 386], [386, 385], [385, 384], [384, 398], [398, 362],
+            
+            // Nose
+            [1, 2], [2, 98], [98, 97], [97, 2], [2, 326], [326, 327], [327, 2], [2, 165], [165, 164], [164, 0], [0, 37], [37, 39], [39, 40], [40, 185], [185, 61], [61, 146], [146, 91], [91, 181], [181, 84], [84, 17], [17, 314], [314, 405], [405, 320], [320, 307], [307, 375], [375, 321], [321, 308], [308, 324], [324, 318], [318, 78], [78, 95], [95, 88], [88, 178], [178, 87], [87, 14], [14, 317], [317, 402], [402, 318], [318, 324], [324, 308], [308, 415], [415, 310], [310, 311], [311, 312], [312, 13], [13, 82], [82, 81], [81, 80], [80, 191], [191, 78],
+            
+            // Mouth
+            [61, 84], [84, 17], [17, 314], [314, 405], [405, 320], [320, 307], [307, 375], [375, 321], [321, 308], [308, 324], [324, 318], [318, 78], [78, 95], [95, 88], [88, 178], [178, 87], [87, 14], [14, 317], [317, 402], [402, 318], [318, 324], [324, 308], [308, 415], [415, 310], [310, 311], [311, 312], [312, 13], [13, 82], [82, 81], [81, 80], [80, 191], [191, 78],
+            
+            // Eyebrows
+            [70, 63], [63, 105], [105, 66], [66, 107], [107, 55], [55, 65], [65, 52], [52, 53], [53, 46], [46, 70], [300, 293], [293, 334], [334, 296], [296, 336], [336, 285], [285, 295], [295, 282], [282, 283], [283, 276], [276, 300]
+        ];
+        
+        function toggleMesh() {
+            showMesh = !showMesh;
+            document.getElementById('meshToggle').classList.toggle('active');
+        }
+        
+        function toggleDepth() {
+            showDepth = !showDepth;
+            document.getElementById('depthToggle').classList.toggle('active');
+        }
+        
+        function toggleColors() {
+            realisticColors = !realisticColors;
+            document.getElementById('colorToggle').classList.toggle('active');
+        }
+        
+        async function startAvatar() {
+            if (isRunning) return;
+            
+            try {
+                status.textContent = 'Starting realistic avatar...';
+                
+                faceMesh = new FaceMesh({
+                    locateFile: (file) => {
+                        return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
+                    }
+                });
+                
+                faceMesh.setOptions({
+                    maxNumFaces: 1,
+                    refineLandmarks: true,
+                    minDetectionConfidence: 0.5,
+                    minTrackingConfidence: 0.5
+                });
+                
+                faceMesh.onResults(onResults);
+                
+                camera = new Camera(video, {
+                    onFrame: async () => {
+                        if (isRunning) {
+                            const startTime = performance.now();
+                            await faceMesh.send({image: video});
+                            const endTime = performance.now();
+                            updateProcessingTime(endTime - startTime);
+                        }
+                    },
+                    width: 400,
+                    height: 300
+                });
+                
+                await camera.start();
+                isRunning = true;
+                status.textContent = 'Realistic Avatar Active!';
+                startBtn.disabled = true;
+                stopBtn.disabled = false;
+                screenshotBtn.disabled = false;
+                
+            } catch (error) {
+                console.error('Error starting avatar:', error);
+                status.textContent = 'Error: ' + error.message;
+            }
+        }
+        
+        function stopAvatar() {
+            if (!isRunning) return;
+            
+            isRunning = false;
+            if (camera) {
+                camera.stop();
+            }
+            status.textContent = 'Avatar Stopped';
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+            screenshotBtn.disabled = true;
+            
+            avatarCtx.clearRect(0, 0, avatarCanvas.width, avatarCanvas.height);
+        }
+        
+        function onResults(results) {
+            frameCount++;
+            const currentTime = performance.now();
+            if (currentTime - lastTime >= 1000) {
+                const fps = Math.round((frameCount * 1000) / (currentTime - lastTime));
+                fpsDisplay.textContent = `FPS: ${fps}`;
+                frameCount = 0;
+                lastTime = currentTime;
+            }
+            
+            avatarCtx.clearRect(0, 0, avatarCanvas.width, avatarCanvas.height);
+            
+            if (results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0) {
+                const landmarks = results.multiFaceLandmarks[0];
+                
+                landmarkCountDisplay.textContent = landmarks.length;
+                
+                const expressionData = analyzeExpression(landmarks);
+                currentExpression = expressionData.expression;
+                expressionConfidence = expressionData.confidence;
+                
+                expressionDisplay.textContent = currentExpression.toUpperCase();
+                confidenceDisplay.textContent = Math.round(expressionConfidence * 100) + '%';
+                
+                drawRealisticFaceMesh(landmarks);
+            } else {
+                expressionDisplay.textContent = 'NO FACE';
+                confidenceDisplay.textContent = '0%';
+                landmarkCountDisplay.textContent = '0';
+            }
+            
+            updateMemoryUsage();
+        }
+        
+        function analyzeExpression(landmarks) {
+            const leftEyeTop = 159;
+            const leftEyeBottom = 145;
+            const rightEyeTop = 386;
+            const rightEyeBottom = 374;
+            const mouthTop = 13;
+            const mouthBottom = 14;
+            const leftEyebrow = 70;
+            const rightEyebrow = 300;
+            const leftMouthCorner = 61;
+            const rightMouthCorner = 291;
+            
+            const leftEyeOpenness = Math.abs(landmarks[leftEyeTop].y - landmarks[leftEyeBottom].y);
+            const rightEyeOpenness = Math.abs(landmarks[rightEyeTop].y - landmarks[rightEyeBottom].y);
+            const avgEyeOpenness = (leftEyeOpenness + rightEyeOpenness) / 2;
+            
+            const mouthOpenness = Math.abs(landmarks[mouthTop].y - landmarks[mouthBottom].y);
+            const mouthWidth = Math.abs(landmarks[leftMouthCorner].x - landmarks[rightMouthCorner].x);
+            
+            const eyebrowHeight = (landmarks[leftEyebrow].y + landmarks[rightEyebrow].y) / 2;
+            
+            let expression = "neutral";
+            let confidence = 0.5;
+            
+            if (avgEyeOpenness < 0.015 && mouthOpenness < 0.01) {
+                expression = "sleepy";
+                confidence = 0.9;
+            } else if (mouthOpenness > 0.06) {
+                expression = "surprised";
+                confidence = 0.95;
+            } else if (eyebrowHeight < 0.25) {
+                expression = "surprised";
+                confidence = 0.8;
+            } else if (mouthWidth > 0.35 && mouthOpenness < 0.02) {
+                expression = "happy";
+                confidence = 0.9;
+            } else if (mouthOpenness < 0.005 && mouthWidth < 0.2) {
+                expression = "serious";
+                confidence = 0.7;
+            } else if (avgEyeOpenness > 0.05) {
+                expression = "alert";
+                confidence = 0.8;
+            }
+            
+            return { expression, confidence };
+        }
+        
+        function drawRealisticFaceMesh(landmarks) {
+            const canvas = avatarCanvas;
+            const ctx = avatarCtx;
+            
+            // Set background
+            ctx.fillStyle = '#2c3e50';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Scale landmarks to canvas size
+            const scaleX = canvas.width;
+            const scaleY = canvas.height;
+            
+            // Convert landmarks to 2D points
+            const points = [];
+            for (let i = 0; i < landmarks.length; i++) {
+                const landmark = landmarks[i];
+                const x = landmark.x * scaleX;
+                const y = landmark.y * scaleY;
+                const z = landmark.z;
+                points.push({ x, y, z });
+            }
+            
+            if (showMesh) {
+                // Draw face mesh connections
+                ctx.strokeStyle = realisticColors ? '#fdbcb4' : '#ffffff';
+                ctx.lineWidth = 1;
+                
+                for (const connection of FACE_MESH_CONNECTIONS) {
+                    const [startIdx, endIdx] = connection;
+                    if (startIdx < points.length && endIdx < points.length) {
+                        const start = points[startIdx];
+                        const end = points[endIdx];
+                        
+                        if (showDepth) {
+                            // Color based on depth
+                            const depth = (start.z + end.z) / 2;
+                            const intensity = Math.max(0, Math.min(255, 255 * (1 - Math.abs(depth))));
+                            ctx.strokeStyle = `rgb(${intensity}, ${intensity}, ${intensity})`;
+                        }
+                        
+                        ctx.beginPath();
+                        ctx.moveTo(start.x, start.y);
+                        ctx.lineTo(end.x, end.y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            
+            // Fill face areas with realistic colors
+            if (realisticColors) {
+                fillFaceAreas(ctx, points);
+            }
+        }
+        
+        function fillFaceAreas(ctx, points) {
+            // Face outline
+            const faceOutlineIndices = [10, 338, 297, 332, 284, 251, 389, 356, 454, 323, 361, 288, 397, 365, 379, 378, 400, 377, 152, 148, 176, 149, 150, 136, 172, 58, 132, 93, 234, 127, 162, 21, 54, 103, 67, 109];
+            
+            if (faceOutlineIndices.length > 0) {
+                ctx.fillStyle = '#fdbcb4'; // Skin color
+                ctx.beginPath();
+                
+                for (let i = 0; i < faceOutlineIndices.length; i++) {
+                    const idx = faceOutlineIndices[i];
+                    if (idx < points.length) {
+                        const point = points[idx];
+                        if (i === 0) {
+                            ctx.moveTo(point.x, point.y);
+                        } else {
+                            ctx.lineTo(point.x, point.y);
+                        }
+                    }
+                }
+                
+                ctx.closePath();
+                ctx.fill();
+            }
+            
+            // Eyes
+            const leftEyeIndices = [33, 7, 163, 144, 145, 153, 154, 155, 133, 173, 157, 158, 159, 160, 161, 246];
+            const rightEyeIndices = [362, 382, 381, 380, 374, 373, 390, 249, 263, 466, 388, 387, 386, 385, 384, 398];
+            
+            // Fill left eye
+            if (leftEyeIndices.length > 0) {
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                
+                for (let i = 0; i < leftEyeIndices.length; i++) {
+                    const idx = leftEyeIndices[i];
+                    if (idx < points.length) {
+                        const point = points[idx];
+                        if (i === 0) {
+                            ctx.moveTo(point.x, point.y);
+                        } else {
+                            ctx.lineTo(point.x, point.y);
+                        }
+                    }
+                }
+                
+                ctx.closePath();
+                ctx.fill();
+            }
+            
+            // Fill right eye
+            if (rightEyeIndices.length > 0) {
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                
+                for (let i = 0; i < rightEyeIndices.length; i++) {
+                    const idx = rightEyeIndices[i];
+                    if (idx < points.length) {
+                        const point = points[idx];
+                        if (i === 0) {
+                            ctx.moveTo(point.x, point.y);
+                        } else {
+                            ctx.lineTo(point.x, point.y);
+                        }
+                    }
+                }
+                
+                ctx.closePath();
+                ctx.fill();
+            }
+            
+            // Mouth
+            const mouthIndices = [61, 84, 17, 314, 405, 320, 307, 375, 321, 308, 324, 318];
+            
+            if (mouthIndices.length > 0) {
+                ctx.fillStyle = '#e74c3c';
+                ctx.beginPath();
+                
+                for (let i = 0; i < mouthIndices.length; i++) {
+                    const idx = mouthIndices[i];
+                    if (idx < points.length) {
+                        const point = points[idx];
+                        if (i === 0) {
+                            ctx.moveTo(point.x, point.y);
+                        } else {
+                            ctx.lineTo(point.x, point.y);
+                        }
+                    }
+                }
+                
+                ctx.closePath();
+                ctx.fill();
+            }
+        }
+        
+        function updateProcessingTime(time) {
+            processingTimeDisplay.textContent = Math.round(time) + 'ms';
+        }
+        
+        function updateMemoryUsage() {
+            if (performance.memory) {
+                const memoryMB = Math.round(performance.memory.usedJSHeapSize / 1024 / 1024);
+                memoryUsageDisplay.textContent = memoryMB + 'MB';
+            }
+        }
+        
+        function takeScreenshot() {
+            const link = document.createElement('a');
+            link.download = `realistic-avatar-screenshot-${Date.now()}.png`;
+            link.href = avatarCanvas.toDataURL();
+            link.click();
+        }
+        
+        // Auto-start when page loads
+        window.addEventListener('load', () => {
+            setTimeout(startAvatar, 1000);
+        });
+    </script>
+</body>
+</html> 
