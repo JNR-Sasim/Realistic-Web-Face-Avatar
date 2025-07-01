@@ -118,16 +118,16 @@
             <a href="https://github.com/JNR-Sasim/Realistic-Web-Face-Avatar" class="btn" style="background: rgba(255,255,255,0.2);" target="_blank">📁 GitHub</a>
         </div>
         
-        <p class="loading">Loading your avatar experience...</p>
+        <p class="loading">Choose your experience above! 🎭</p>
     </div>
     
     <script>
-        // Auto-redirect after 3 seconds
-        setTimeout(() => {
-            window.location.href = 'online_realistic_avatar.html';
-        }, 3000);
+        // Remove auto-redirect - let users choose
+        // setTimeout(() => {
+        //     window.location.href = 'online_realistic_avatar.html';
+        // }, 3000);
         
-        // Also redirect on button click
+        // Only redirect on button click
         document.querySelector('.btn').addEventListener('click', (e) => {
             e.preventDefault();
             window.location.href = 'online_realistic_avatar.html';
