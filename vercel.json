@@ -3,6 +3,14 @@
   "rewrites": [
     {
       "source": "/",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/portfolio",
+      "destination": "/portfolio.html"
+    },
+    {
+      "source": "/avatar",
       "destination": "/online_realistic_avatar.html"
     }
   ],
