@@ -153,8 +153,8 @@
             right: 0;
             bottom: 0;
             background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), 
-                                      rgba(255, 255, 255, 0.3) 0%, 
-                                      transparent 50%);
+                                      rgba(255, 255, 255, 0.6) 0%, 
+                                      transparent 60%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -171,8 +171,8 @@
             right: 0;
             bottom: 0;
             background: radial-gradient(circle at 50% 50%, 
-                                      rgba(255, 255, 255, 0.2) 0%, 
-                                      transparent 40%);
+                                      rgba(255, 255, 255, 0.4) 0%, 
+                                      transparent 50%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -182,8 +182,8 @@
         }
 
         @keyframes spotlightPulse {
-            0%, 100% { opacity: 0.3; transform: scale(1); }
-            50% { opacity: 0.6; transform: scale(1.1); }
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.2); }
         }
 
         @keyframes gradientShift {
@@ -873,16 +873,29 @@
         // Spotlight effect for hero name
         const heroName = document.querySelector('.hero h1');
         
-        document.addEventListener('mousemove', function(e) {
-            if (heroName) {
+        if (heroName) {
+            // Set initial spotlight position
+            heroName.style.setProperty('--mouse-x', '50%');
+            heroName.style.setProperty('--mouse-y', '50%');
+            
+            document.addEventListener('mousemove', function(e) {
                 const rect = heroName.getBoundingClientRect();
                 const x = ((e.clientX - rect.left) / rect.width) * 100;
                 const y = ((e.clientY - rect.top) / rect.height) * 100;
                 
                 heroName.style.setProperty('--mouse-x', x + '%');
                 heroName.style.setProperty('--mouse-y', y + '%');
-            }
-        });
+            });
+            
+            // Add hover effect for better visibility
+            heroName.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.02)';
+            });
+            
+            heroName.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+            });
+        }
 
         // Intersection Observer for animations
         const observerOptions = {
