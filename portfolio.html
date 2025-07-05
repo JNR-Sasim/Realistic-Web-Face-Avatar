@@ -6,6 +6,7 @@
     <title>JNR-Sasim - Portfolio</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -761,6 +762,11 @@
             });
         });
 
+        // Initialize EmailJS
+        (function() {
+            emailjs.init("YOUR_PUBLIC_KEY"); // You'll need to replace this with your actual EmailJS public key
+        })();
+
         // Contact form handling
         document.getElementById('contactForm').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -769,12 +775,62 @@
             const email = document.getElementById('email').value;
             const message = document.getElementById('message').value;
             
-            // Show success message (in a real app, you'd send this to a server)
-            alert(`Thank you for your message, ${name}! I'll get back to you at ${email} soon.`);
+            // Show loading state
+            const submitBtn = this.querySelector('.submit-btn');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Sending...';
+            submitBtn.disabled = true;
             
-            // Reset form
-            this.reset();
+            // Prepare email template parameters
+            const templateParams = {
+                from_name: name,
+                from_email: email,
+                message: message,
+                to_name: 'Futhi Jr Simelane'
+            };
+            
+            // Send email using EmailJS
+            emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams)
+                .then(function(response) {
+                    console.log('SUCCESS!', response.status, response.text);
+                    showNotification('Message sent successfully! I\'ll get back to you soon.', 'success');
+                    document.getElementById('contactForm').reset();
+                }, function(error) {
+                    console.log('FAILED...', error);
+                    showNotification('Failed to send message. Please try again or contact me directly.', 'error');
+                })
+                .finally(function() {
+                    // Reset button state
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+                });
         });
+
+        // Show notification function
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? 'linear-gradient(45deg, #00d4aa, #667eea)' : 'linear-gradient(45deg, #ff4757, #ff6b35)'};
+                color: white;
+                padding: 1rem 2rem;
+                border-radius: 15px;
+                z-index: 3000;
+                animation: slideIn 0.3s ease;
+                font-weight: 600;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+                max-width: 400px;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 5000);
+        }
 
         // Intersection Observer for animations
         const observerOptions = {
