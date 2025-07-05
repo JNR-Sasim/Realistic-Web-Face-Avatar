@@ -289,6 +289,26 @@
             font-size: 4rem;
             animation: gradientMove 3s ease-in-out infinite;
             position: relative;
+            overflow: hidden;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .product-card:hover .product-image img {
+            transform: scale(1.1);
+        }
+
+        .product-image .icon-fallback {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
         }
 
         @keyframes gradientMove {
@@ -579,7 +599,8 @@
                 description: "Latest MacBook Pro with M3 chip, 16GB RAM, 512GB SSD",
                 price: 1999.99,
                 category: "laptop",
-                icon: "fas fa-laptop"
+                icon: "fas fa-laptop",
+                image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=500&h=500&fit=crop&crop=center"
             },
             {
                 id: 2,
@@ -587,7 +608,8 @@
                 description: "Apple's flagship smartphone with A17 Pro chip",
                 price: 999.99,
                 category: "phone",
-                icon: "fas fa-mobile-alt"
+                icon: "fas fa-mobile-alt",
+                image: "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=500&h=500&fit=crop&crop=center"
             },
             {
                 id: 3,
@@ -595,7 +617,8 @@
                 description: "Android flagship with AI features and 200MP camera",
                 price: 899.99,
                 category: "phone",
-                icon: "fas fa-mobile-alt"
+                icon: "fas fa-mobile-alt",
+                image: "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=500&h=500&fit=crop&crop=center"
             },
             {
                 id: 4,
@@ -603,7 +626,8 @@
                 description: "Premium Windows laptop with 13-inch InfinityEdge display",
                 price: 1299.99,
                 category: "laptop",
-                icon: "fas fa-laptop"
+                icon: "fas fa-laptop",
+                image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=500&h=500&fit=crop&crop=center"
             },
             {
                 id: 5,
@@ -611,7 +635,8 @@
                 description: "Wireless earbuds with active noise cancellation",
                 price: 249.99,
                 category: "accessory",
-                icon: "fas fa-headphones"
+                icon: "fas fa-headphones",
+                image: "https://images.unsplash.com/photo-1606220945770-b5b6c2c55bf1?w=500&h=500&fit=crop&crop=center"
             },
             {
                 id: 6,
@@ -619,7 +644,8 @@
                 description: "Apple's premium wireless keyboard with Touch ID",
                 price: 99.99,
                 category: "accessory",
-                icon: "fas fa-keyboard"
+                icon: "fas fa-keyboard",
+                image: "https://images.unsplash.com/photo-1541140532154-b024d705b90a?w=500&h=500&fit=crop&crop=center"
             },
             {
                 id: 7,
@@ -627,7 +653,8 @@
                 description: "Versatile tablet perfect for work and creativity",
                 price: 599.99,
                 category: "laptop",
-                icon: "fas fa-tablet-alt"
+                icon: "fas fa-tablet-alt",
+                image: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=500&h=500&fit=crop&crop=center"
             },
             {
                 id: 8,
@@ -635,7 +662,44 @@
                 description: "Smartwatch with health monitoring and fitness tracking",
                 price: 399.99,
                 category: "accessory",
-                icon: "fas fa-clock"
+                icon: "fas fa-clock",
+                image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&h=500&fit=crop&crop=center"
+            },
+            {
+                id: 9,
+                name: "Sony WH-1000XM5",
+                description: "Premium noise-cancelling headphones with 30-hour battery",
+                price: 349.99,
+                category: "accessory",
+                icon: "fas fa-headphones",
+                image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&h=500&fit=crop&crop=center"
+            },
+            {
+                id: 10,
+                name: "DJI Mini 3 Pro",
+                description: "Ultralight drone with 4K camera and obstacle avoidance",
+                price: 759.99,
+                category: "accessory",
+                icon: "fas fa-drone",
+                image: "https://images.unsplash.com/photo-1579829366248-204fe8413f31?w=500&h=500&fit=crop&crop=center"
+            },
+            {
+                id: 11,
+                name: "Microsoft Surface Pro 9",
+                description: "2-in-1 laptop and tablet with detachable keyboard",
+                price: 1099.99,
+                category: "laptop",
+                icon: "fas fa-tablet-alt",
+                image: "https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=500&h=500&fit=crop&crop=center"
+            },
+            {
+                id: 12,
+                name: "Google Pixel 8 Pro",
+                description: "Android phone with advanced AI camera features",
+                price: 899.99,
+                category: "phone",
+                icon: "fas fa-mobile-alt",
+                image: "https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=500&h=500&fit=crop&crop=center"
             }
         ];
 
@@ -658,7 +722,8 @@
                 card.className = 'product-card';
                 card.innerHTML = `
                     <div class="product-image">
-                        <i class="${product.icon}"></i>
+                        <img src="${product.image}" alt="${product.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <i class="${product.icon} icon-fallback" style="display: none;"></i>
                     </div>
                     <div class="product-content">
                         <h3 class="product-title">${product.name}</h3>
