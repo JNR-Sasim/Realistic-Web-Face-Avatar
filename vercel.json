@@ -12,6 +12,10 @@
     {
       "source": "/avatar",
       "destination": "/online_realistic_avatar.html"
+    },
+    {
+      "source": "/ecommerce",
+      "destination": "/ecommerce.html"
     }
   ],
   "headers": [
