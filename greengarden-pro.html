@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GreenGarden Pro - Revolutionary Garden Solutions</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #000000;
+            color: #ffffff;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.3) 0%, transparent 50%);
+            z-index: -1;
+            animation: backgroundShift 20s ease-in-out infinite;
+        }
+
+        @keyframes backgroundShift {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(1deg); }
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4, #45b7d1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: logoGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes logoGlow {
+            0%, 100% { filter: drop-shadow(0 0 5px rgba(255, 107, 107, 0.5)); }
+            50% { filter: drop-shadow(0 0 20px rgba(78, 205, 196, 0.8)); }
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+        }
+
+        .nav-links a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+            border-radius: 25px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .nav-links a:hover::before {
+            opacity: 1;
+        }
+
+        .nav-links a:hover {
+            color: #ffffff;
+            transform: translateY(-2px);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                        url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2832&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(255, 107, 107, 0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        .floating-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .floating-element {
+            position: absolute;
+            opacity: 0.3;
+            animation: float 6s ease-in-out infinite;
+            font-size: 2rem;
+        }
+
+        .floating-element:nth-child(1) {
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .floating-element:nth-child(2) {
+            top: 60%;
+            right: 15%;
+            animation-delay: 2s;
+        }
+
+        .floating-element:nth-child(3) {
+            bottom: 30%;
+            left: 20%;
+            animation-delay: 4s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+
+        .hero-content {
+            max-width: 800px;
+            z-index: 2;
+            position: relative;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4, #45b7d1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+            animation: textGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes textGlow {
+            from { filter: drop-shadow(0 0 10px rgba(255, 107, 107, 0.5)); }
+            to { filter: drop-shadow(0 0 20px rgba(78, 205, 196, 0.8)); }
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: #cbd5e1;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+            color: #ffffff;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .cta-button:hover::before {
+            left: 100%;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 40px rgba(255, 107, 107, 0.4);
+        }
+
+        /* Trusted By Section */
+        .trusted-by {
+            padding: 4rem 0;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .trusted-by h2 {
+            text-align: center;
+            font-size: 1.5rem;
+            color: #cbd5e1;
+            margin-bottom: 3rem;
+            font-weight: 500;
+        }
+
+        .logos {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .logo-item {
+            font-size: 1.25rem;
+            color: #4ecdc4;
+            font-weight: 600;
+            animation: logoFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+
+        /* Benefits Section */
+        .benefits {
+            padding: 6rem 0;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-header h2 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-header p {
+            font-size: 1.25rem;
+            color: #cbd5e1;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .benefit-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.4s ease;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .benefit-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 107, 107, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .benefit-card:hover::before {
+            left: 100%;
+        }
+
+        .benefit-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 25px 50px rgba(255, 107, 107, 0.3);
+            border-color: rgba(255, 107, 107, 0.5);
+        }
+
+        .benefit-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 15px;
+            margin-bottom: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .benefit-card:hover img {
+            transform: scale(1.05);
+        }
+
+        .benefit-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .benefit-card h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #ffffff;
+        }
+
+        .benefit-card p {
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+
+        /* Products Section */
+        .products {
+            padding: 6rem 0;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 3rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .product-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.4s ease;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .product-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(255, 107, 107, 0.1) 50%, transparent 70%);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+
+        .product-card:hover::after {
+            transform: translateX(100%);
+        }
+
+        .product-card:hover {
+            transform: translateY(-15px) scale(1.03);
+            box-shadow: 0 30px 60px rgba(255, 107, 107, 0.3);
+            border-color: rgba(255, 107, 107, 0.5);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 15px;
+            margin-bottom: 1.5rem;
+            transition: all 0.4s ease;
+        }
+
+        .product-card:hover .product-image {
+            transform: scale(1.1) rotate(2deg);
+        }
+
+        .product-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+        }
+
+        .product-card h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .product-card p {
+            color: #cbd5e1;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .learn-more {
+            color: #4ecdc4;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .learn-more:hover {
+            color: #ff6b6b;
+        }
+
+        /* Testimonials */
+        .testimonials {
+            padding: 6rem 0;
+        }
+
+        .testimonial-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .testimonial-text {
+            font-size: 1.25rem;
+            font-style: italic;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+            color: #ffffff;
+        }
+
+        .testimonial-author {
+            font-weight: 600;
+            color: #4ecdc4;
+        }
+
+        .testimonial-role {
+            color: #cbd5e1;
+            font-size: 0.9rem;
+        }
+
+        /* Contact Section */
+        .contact {
+            padding: 6rem 0;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .contact-info {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .contact-info h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: #4ecdc4;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .contact-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .contact-text {
+            color: #cbd5e1;
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(0, 0, 0, 0.95);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2rem 0;
+            text-align: center;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .footer p {
+            color: #cbd5e1;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Particle Effects */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 107, 107, 0.6);
+            border-radius: 50%;
+            animation: particle-float 8s linear infinite;
+        }
+
+        @keyframes particle-float {
+            0% {
+                transform: translateY(100vh) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) translateX(100px);
+                opacity: 0;
+            }
+        }
+
+        /* Glowing text effect */
+        .glow-text {
+            text-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 10px rgba(255, 107, 107, 0.5); }
+            to { text-shadow: 0 0 20px rgba(78, 205, 196, 0.8), 0 0 30px rgba(255, 107, 107, 0.6); }
+        }
+
+        /* 3D Card Effect */
+        .card-3d {
+            transform-style: preserve-3d;
+            transition: transform 0.3s ease;
+        }
+
+        .card-3d:hover {
+            transform: rotateY(10deg) rotateX(5deg);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .benefits-grid,
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .logos {
+                gap: 2rem;
+            }
+        }
+
+        /* Animations */
+        .fade-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .slide-in-left {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .slide-in-right {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- Particle Effects -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">GreenGarden Pro</div>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#products">Products</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="floating-elements">
+            <div class="floating-element">🌱</div>
+            <div class="floating-element">🌿</div>
+            <div class="floating-element">🌺</div>
+        </div>
+        <div class="hero-content">
+            <h1 class="glow-text">Revolutionary Garden Solutions for Every Home</h1>
+            <p>Transforming gardens with innovative tools and sustainable practices. Over 50 years of expertise helping gardens thrive.</p>
+            <a href="#contact" class="cta-button">Start Growing Today</a>
+        </div>
+    </section>
+
+    <!-- Trusted By Section -->
+    <section class="trusted-by">
+        <div class="container">
+            <h2>Trusted by Garden Enthusiasts Worldwide</h2>
+            <div class="logos">
+                <div class="logo-item">GardenTools</div>
+                <div class="logo-item">PlantCare</div>
+                <div class="logo-item">GreenThumb</div>
+                <div class="logo-item">GrowMaster</div>
+                <div class="logo-item">BloomPro</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section id="about" class="benefits">
+        <div class="section-header fade-in">
+            <h2>The Future of Gardening</h2>
+            <p>Revolutionary solutions that combine innovative tools with sustainable practices to transform every garden.</p>
+        </div>
+        <div class="benefits-grid">
+            <div class="benefit-card fade-in card-3d">
+                <img src="https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2072&q=80" alt="Pest Control">
+                <div class="benefit-icon">🛡️</div>
+                <h3>Natural Pest Protection</h3>
+                <p>Eco-friendly pest control solutions that keep your plants healthy without harmful chemicals.</p>
+            </div>
+            <div class="benefit-card fade-in card-3d">
+                <img src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Plant Nutrition">
+                <div class="benefit-icon">🌱</div>
+                <h3>Smart Nutrition Systems</h3>
+                <p>Advanced plant nutrition that adapts to your garden's specific needs and growing conditions.</p>
+            </div>
+            <div class="benefit-card fade-in card-3d">
+                <img src="https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Innovation">
+                <div class="benefit-icon">🔬</div>
+                <h3>Innovation Lab</h3>
+                <p>Research facilities developing breakthrough gardening tools and sustainable solutions.</p>
+            </div>
+            <div class="benefit-card fade-in card-3d">
+                <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2071&q=80" alt="Environmental">
+                <div class="benefit-icon">🌍</div>
+                <h3>Eco-Friendly Practices</h3>
+                <p>Sustainable gardening methods that protect the environment while maximizing plant growth.</p>
+            </div>
+            <div class="benefit-card fade-in card-3d">
+                <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2071&q=80" alt="Expert Support">
+                <div class="benefit-icon">👥</div>
+                <h3>Expert Garden Support</h3>
+                <p>Dedicated team of gardening experts providing personalized advice and support.</p>
+            </div>
+            <div class="benefit-card fade-in card-3d">
+                <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2832&q=80" alt="Proven Results">
+                <div class="benefit-icon">📈</div>
+                <h3>Proven Results</h3>
+                <p>Track record of success with thousands of thriving gardens across the world.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products Section -->
+    <section id="products" class="products">
+        <div class="section-header fade-in">
+            <h2>Premium Garden Tools</h2>
+            <p>Innovative tools and solutions that transform every garden into a thriving paradise.</p>
+        </div>
+        <div class="products-grid">
+            <div class="product-card slide-in-left card-3d">
+                <img src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Garden Tools" class="product-image">
+                <div class="product-icon">✨</div>
+                <h3>GrowMaster Pro</h3>
+                <p>Advanced gardening tools designed for optimal plant growth and garden maintenance.</p>
+                <a href="#" class="learn-more">Explore Tools →</a>
+            </div>
+            <div class="product-card slide-in-right card-3d">
+                <img src="https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2072&q=80" alt="Plant Care" class="product-image">
+                <div class="product-icon">🛡️</div>
+                <h3>PlantShield Plus</h3>
+                <p>Comprehensive plant protection using natural methods and eco-friendly solutions.</p>
+                <a href="#" class="learn-more">Discover Protection →</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="testimonials">
+        <div class="section-header fade-in">
+            <h2>Gardeners Love Our Tools</h2>
+            <p>See how our innovative solutions are transforming gardens around the world.</p>
+        </div>
+        <div class="testimonial-card fade-in">
+            <p class="testimonial-text">"GreenGarden Pro's tools have completely transformed my garden. My plants are healthier than ever, and the eco-friendly pest control solutions work perfectly. I can't imagine gardening without them."</p>
+            <div class="testimonial-author">Sarah Johnson</div>
+            <div class="testimonial-role">Master Gardener & Plant Enthusiast</div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+        <div class="section-header fade-in">
+            <h2>Start Your Garden Journey</h2>
+            <p>Ready to transform your garden? Connect with our expert team today.</p>
+        </div>
+        <div class="contact-grid">
+            <div class="contact-info slide-in-left">
+                <h3>Garden Center</h3>
+                <div class="contact-item">
+                    <div class="contact-icon">📍</div>
+                    <div class="contact-text">15 Garden Road, Green Valley, 1600</div>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon">📞</div>
+                    <div class="contact-text">011 573 2240</div>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon">✉️</div>
+                    <div class="contact-text">hello@greengardenpro.com</div>
+                </div>
+            </div>
+            <div class="contact-info slide-in-right">
+                <h3>Garden Support</h3>
+                <div class="contact-item">
+                    <div class="contact-icon">🌱</div>
+                    <div class="contact-text">Expert Garden Advice</div>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon">🌐</div>
+                    <div class="contact-text">Online Garden Community</div>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon">📱</div>
+                    <div class="contact-text">Mobile Garden App</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 GreenGarden Pro. Growing Beautiful Gardens Together. | Website by Futhi Jr Simelane</p>
+        </div>
+    </footer>
+
+    <script>
+        // GSAP Animations
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Hero animation
+        gsap.from('.hero-content h1', {
+            duration: 1.5,
+            y: 50,
+            opacity: 0,
+            ease: 'power3.out'
+        });
+
+        gsap.from('.hero-content p', {
+            duration: 1.5,
+            y: 30,
+            opacity: 0,
+            ease: 'power3.out',
+            delay: 0.3
+        });
+
+        gsap.from('.hero-content .cta-button', {
+            duration: 1.5,
+            y: 30,
+            opacity: 0,
+            ease: 'power3.out',
+            delay: 0.6
+        });
+
+        // Scroll-triggered animations
+        gsap.utils.toArray('.fade-in').forEach(element => {
+            gsap.fromTo(element, 
+                {
+                    y: 50,
+                    opacity: 0
+                },
+                {
+                    scrollTrigger: {
+                        trigger: element,
+                        start: 'top 80%',
+                        end: 'bottom 20%',
+                        toggleActions: 'play none none reverse'
+                    },
+                    duration: 1,
+                    y: 0,
+                    opacity: 1,
+                    ease: 'power3.out'
+                }
+            );
+        });
+
+        gsap.utils.toArray('.slide-in-left').forEach(element => {
+            gsap.fromTo(element, 
+                {
+                    x: -100,
+                    opacity: 0
+                },
+                {
+                    scrollTrigger: {
+                        trigger: element,
+                        start: 'top 80%',
+                        end: 'bottom 20%',
+                        toggleActions: 'play none none reverse'
+                    },
+                    duration: 1,
+                    x: 0,
+                    opacity: 1,
+                    ease: 'power3.out'
+                }
+            );
+        });
+
+        gsap.utils.toArray('.slide-in-right').forEach(element => {
+            gsap.fromTo(element, 
+                {
+                    x: 100,
+                    opacity: 0
+                },
+                {
+                    scrollTrigger: {
+                        trigger: element,
+                        start: 'top 80%',
+                        end: 'bottom 20%',
+                        toggleActions: 'play none none reverse'
+                    },
+                    duration: 1,
+                    x: 0,
+                    opacity: 1,
+                    ease: 'power3.out'
+                }
+            );
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Navbar background on scroll
+        window.addEventListener('scroll', () => {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 100) {
+                navbar.style.background = 'rgba(0, 0, 0, 0.95)';
+            } else {
+                navbar.style.background = 'rgba(0, 0, 0, 0.8)';
+            }
+        });
+
+        // Parallax effect for hero section
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const hero = document.querySelector('.hero');
+            const rate = scrolled * -0.5;
+            hero.style.transform = `translateY(${rate}px)`;
+        });
+
+        // Particle effects
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 50;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 8 + 's';
+                particle.style.animationDuration = (Math.random() * 4 + 4) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Mouse trail effect
+        let mouseTrail = [];
+        const maxTrailLength = 20;
+
+        document.addEventListener('mousemove', (e) => {
+            const trail = document.createElement('div');
+            trail.style.position = 'fixed';
+            trail.style.left = e.clientX + 'px';
+            trail.style.top = e.clientY + 'px';
+            trail.style.width = '4px';
+            trail.style.height = '4px';
+            trail.style.background = 'rgba(255, 107, 107, 0.6)';
+            trail.style.borderRadius = '50%';
+            trail.style.pointerEvents = 'none';
+            trail.style.zIndex = '9999';
+            trail.style.transition = 'all 0.3s ease';
+            document.body.appendChild(trail);
+
+            mouseTrail.push(trail);
+
+            if (mouseTrail.length > maxTrailLength) {
+                const oldTrail = mouseTrail.shift();
+                oldTrail.style.opacity = '0';
+                setTimeout(() => oldTrail.remove(), 300);
+            }
+
+            setTimeout(() => {
+                trail.style.opacity = '0';
+                setTimeout(() => trail.remove(), 300);
+            }, 100);
+        });
+
+        // Initialize particles
+        createParticles();
+
+        // Add hover sound effect (optional)
+        document.querySelectorAll('.benefit-card, .product-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = card.style.transform + ' scale(1.02)';
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = card.style.transform.replace(' scale(1.02)', '');
+            });
+        });
+
+        // Add typing effect to hero title
+        function typeWriter(element, text, speed = 100) {
+            let i = 0;
+            element.innerHTML = '';
+            
+            function type() {
+                if (i < text.length) {
+                    element.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                }
+            }
+            type();
+        }
+
+        // Optional: Add typing effect on page load
+        // const heroTitle = document.querySelector('.hero h1');
+        // const originalText = heroTitle.textContent;
+        // typeWriter(heroTitle, originalText, 50);
+    </script>
+</body>
+</html> 
