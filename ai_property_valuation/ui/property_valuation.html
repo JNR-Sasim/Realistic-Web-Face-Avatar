@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI Property Valuation</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0b1220;
+      --panel: #0f172a;
+      --muted: #93a4b8;
+      --text: #e6edf3;
+      --brand1: #667eea;
+      --brand2: #764ba2;
+      --accent: #22c55e;
+      --border: #22314d;
+    }
+    * { box-sizing: border-box; }
+    body { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 0; background: var(--bg); color: var(--text); }
+    a { color: inherit; text-decoration: none; }
+
+    /* Header */
+    .header { position: sticky; top: 0; z-index: 20; backdrop-filter: blur(10px); background: rgba(11,18,32,0.6); border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .nav { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; }
+    .logo { font-weight: 800; font-size: 18px; background: linear-gradient(45deg, var(--brand1), var(--brand2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .nav a { color: var(--muted); font-weight: 600; margin-left: 18px; }
+    .nav a:hover { color: #fff; }
+
+    /* Hero */
+    .hero { position: relative; padding: 72px 18px 36px; background: radial-gradient(80% 80% at 0% 0%, rgba(102,126,234,0.15) 0%, transparent 60%), radial-gradient(80% 80% at 100% 100%, rgba(118,75,162,0.15) 0%, transparent 60%); }
+    .hero-inner { max-width: 1100px; margin: 0 auto; display: grid; gap: 18px; }
+    .title { font-size: 42px; font-weight: 800; line-height: 1.1; margin: 0; }
+    .subtitle { color: var(--muted); font-size: 18px; }
+    .cta-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 10px; }
+    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 16px; border-radius: 10px; border: 1px solid var(--border); background: #0b1328; color: #fff; font-weight: 700; cursor: pointer; }
+    .btn.primary { background: linear-gradient(45deg, var(--brand1), var(--brand2)); border: none; }
+    .btn.ghost { background: transparent; }
+
+    /* Settings bar */
+    .settings { background: #0b1328; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .settings-inner { max-width: 1100px; margin: 0 auto; padding: 14px 18px; display: grid; grid-template-columns: 1fr auto auto; gap: 12px; align-items: center; }
+    .settings input { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border); background: #091025; color: var(--text); }
+    .status { font-size: 12px; color: var(--muted); }
+
+    /* Sections */
+    .section { padding: 40px 18px; }
+    .container { max-width: 1100px; margin: 0 auto; }
+    .section h2 { font-size: 26px; margin: 0 0 8px 0; }
+    .section p.lead { color: var(--muted); margin: 0 0 16px 0; }
+
+    /* Features */
+    .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+    .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+    .card h3 { margin: 0 0 6px 0; font-size: 16px; }
+    .card p { margin: 0; color: var(--muted); font-size: 14px; }
+
+    /* Predictor */
+    .predictor { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    label { font-size: 12px; color: var(--muted); }
+    input, select { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border); background: #0b1328; color: var(--text); }
+    .actions { margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap; }
+    .result { margin-top: 14px; padding: 16px; background: #0b1328; border: 1px solid var(--border); border-radius: 12px; }
+    .muted { color: var(--muted); font-size: 12px; }
+
+    /* Footer */
+    .footer { padding: 24px 18px; border-top: 1px solid var(--border); color: var(--muted); }
+
+    @media (max-width: 900px) { .grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } .title { font-size: 32px; } .settings-inner { grid-template-columns: 1fr; } }
+  </style>
+  <script>
+    const getApiBase = () => {
+      return (window.API_BASE || localStorage.getItem('apiBase') || 'http://127.0.0.1:8000').replace(/\/$/, '');
+    }
+    function setApiBaseFromInput() {
+      const val = document.getElementById('apiBase').value.trim();
+      if (!val) return;
+      localStorage.setItem('apiBase', val);
+      document.getElementById('apiStatus').innerText = 'Saved';
+      document.getElementById('apiStatus').style.color = '#22c55e';
+      setTimeout(() => { document.getElementById('apiStatus').innerText = ''; }, 1500);
+    }
+    async function testConnection() {
+      const el = document.getElementById('apiStatus');
+      el.innerText = 'Testing...'; el.style.color = '#a3a3a3';
+      try {
+        const res = await fetch(getApiBase() + '/');
+        if (res.ok) { el.innerText = 'Connected'; el.style.color = '#22c55e'; }
+        else { el.innerText = 'No response'; el.style.color = '#f59e0b'; }
+      } catch { el.innerText = 'Failed'; el.style.color = '#ef4444'; }
+    }
+    async function predict() {
+      const payload = {
+        bedrooms: parseInt(document.getElementById('bedrooms').value || '3'),
+        bathrooms: parseFloat(document.getElementById('bathrooms').value || '2'),
+        sqft: parseInt(document.getElementById('sqft').value || '1500'),
+        lot_size: parseInt(document.getElementById('lot_size').value || '3000'),
+        year_built: parseInt(document.getElementById('year_built').value || '2000'),
+        city: document.getElementById('city').value || 'Austin',
+        property_type: document.getElementById('property_type').value || 'house',
+        has_garage: parseInt(document.getElementById('has_garage').value || '1'),
+        has_garden: parseInt(document.getElementById('has_garden').value || '0'),
+        condition_rating: parseInt(document.getElementById('condition_rating').value || '7'),
+        walk_score: parseInt(document.getElementById('walk_score').value || '60'),
+        school_score: parseInt(document.getElementById('school_score').value || '65'),
+        crime_index: parseInt(document.getElementById('crime_index').value || '40')
+      };
+      const btn = document.getElementById('btn');
+      btn.disabled = true; const prev = btn.innerText; btn.innerText = 'Predicting...';
+      try {
+        const res = await fetch(getApiBase() + '/predict', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        const data = await res.json();
+        document.getElementById('price').innerText = `$${Number(data.predicted_price).toLocaleString()}`;
+      } catch (e) {
+        document.getElementById('price').innerText = 'Error connecting to API. Set API URL above and start the server.';
+      } finally { btn.disabled = false; btn.innerText = prev; }
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('apiBase').value = getApiBase();
+    });
+  </script>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="nav">
+      <div class="logo">AI Property Valuation</div>
+      <nav>
+        <a href="#overview">Overview</a>
+        <a href="#features">Features</a>
+        <a href="#how">How it Works</a>
+        <a href="#try">Try It</a>
+        <a href="#" onclick="window.open(getApiBase() + '/docs','_blank'); return false;">API Docs</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero" id="overview">
+    <div class="hero-inner">
+      <h1 class="title">Instant property price estimates with production‑ready AI</h1>
+      <p class="subtitle">Predict home values using a scikit‑learn pipeline: StandardScaler + OneHotEncoder + RandomForestRegressor. Use the hosted API or run locally for private datasets.</p>
+      <div class="cta-row">
+        <a class="btn primary" href="#try">Try the Predictor</a>
+        <a class="btn ghost" href="#features">Explore Features</a>
+        <a class="btn" href="#" onclick="window.open(getApiBase() + '/docs','_blank'); return false;">Open API Docs</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Settings Bar -->
+  <div class="settings">
+    <div class="settings-inner">
+      <input id="apiBase" placeholder="API Base URL (e.g. http://127.0.0.1:8000 or https://your-api.onrender.com)" />
+      <button class="btn" onclick="setApiBaseFromInput()">Save API URL</button>
+      <div class="status" id="apiStatus"></div>
+    </div>
+  </div>
+
+  <!-- Features -->
+  <section class="section" id="features">
+    <div class="container">
+      <h2>Features</h2>
+      <p class="lead">Built for accuracy, speed, and clarity.</p>
+      <div class="features">
+        <div class="card">
+          <h3>Fast, explainable estimates</h3>
+          <p>Predict in milliseconds using a tuned RandomForestRegressor with transparent preprocessing.</p>
+        </div>
+        <div class="card">
+          <h3>Real‑world features</h3>
+          <p>Bedrooms, bathrooms, square footage, lot size, city, property type, condition, walkability, schools, and crime.</p>
+        </div>
+        <div class="card">
+          <h3>Production‑ready API</h3>
+          <p>FastAPI service with CORS, typed schema, Swagger docs, and easy deployment presets.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it Works -->
+  <section class="section" id="how">
+    <div class="container">
+      <h2>How it works</h2>
+      <p class="lead">Train once, serve everywhere.</p>
+      <div class="features">
+        <div class="card">
+          <h3>1. Data</h3>
+          <p>Use your CSV at <code>ai_property_valuation/data/properties.csv</code> or the synthetic fallback for demos.</p>
+        </div>
+        <div class="card">
+          <h3>2. Model</h3>
+          <p>A scikit‑learn pipeline: StandardScaler + OneHotEncoder + RandomForestRegressor, saved with Joblib.</p>
+        </div>
+        <div class="card">
+          <h3>3. API</h3>
+          <p>FastAPI endpoint <code>/predict</code> accepts JSON features and returns the estimated price in USD.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Try It -->
+  <section class="section" id="try">
+    <div class="container">
+      <h2>Try the predictor</h2>
+      <p class="lead">Fill in the property details and get an instant estimate.</p>
+      <div class="predictor">
+        <div class="grid">
+          <div>
+            <label>Bedrooms</label>
+            <input id="bedrooms" type="number" value="3" min="0" max="20" />
+          </div>
+          <div>
+            <label>Bathrooms</label>
+            <input id="bathrooms" type="number" step="0.5" value="2" min="0" max="20" />
+          </div>
+          <div>
+            <label>Square Feet</label>
+            <input id="sqft" type="number" value="1500" min="100" max="20000" />
+          </div>
+          <div>
+            <label>Lot Size (sqft)</label>
+            <input id="lot_size" type="number" value="3000" min="0" max="200000" />
+          </div>
+          <div>
+            <label>Year Built</label>
+            <input id="year_built" type="number" value="2005" min="1800" max="2100" />
+          </div>
+          <div>
+            <label>City</label>
+            <select id="city">
+              <option>San Francisco</option>
+              <option>New York</option>
+              <option>Austin</option>
+              <option>Seattle</option>
+              <option>Denver</option>
+              <option selected>Miami</option>
+            </select>
+          </div>
+          <div>
+            <label>Property Type</label>
+            <select id="property_type">
+              <option selected>house</option>
+              <option>apartment</option>
+              <option>condo</option>
+              <option>townhouse</option>
+            </select>
+          </div>
+          <div>
+            <label>Has Garage</label>
+            <select id="has_garage">
+              <option value="1" selected>Yes</option>
+              <option value="0">No</option>
+            </select>
+          </div>
+          <div>
+            <label>Has Garden</label>
+            <select id="has_garden">
+              <option value="0" selected>No</option>
+              <option value="1">Yes</option>
+            </select>
+          </div>
+          <div>
+            <label>Condition Rating (1-10)</label>
+            <input id="condition_rating" type="number" value="7" min="1" max="10" />
+          </div>
+          <div>
+            <label>Walk Score (0-100)</label>
+            <input id="walk_score" type="number" value="60" min="0" max="100" />
+          </div>
+          <div>
+            <label>School Score (0-100)</label>
+            <input id="school_score" type="number" value="65" min="0" max="100" />
+          </div>
+          <div>
+            <label>Crime Index (0-100, higher = more crime)</label>
+            <input id="crime_index" type="number" value="40" min="0" max="100" />
+          </div>
+        </div>
+        <div class="actions">
+          <button id="btn" class="btn primary" onclick="predict()">Predict Price</button>
+          <button class="btn" onclick="testConnection()">Test API Connection</button>
+          <a class="btn ghost" href="#" onclick="window.open(getApiBase() + '/docs','_blank'); return false;">Open API Docs</a>
+        </div>
+        <div class="result">
+          <div class="muted">Estimated Price</div>
+          <div id="price" style="font-size:28px; font-weight:800;">—</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div>AI Property Valuation • Built with FastAPI + scikit‑learn</div>
+    </div>
+  </footer>
+</body>
+</html>
+
