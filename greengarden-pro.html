@@ -607,7 +607,7 @@
 
         /* Particle Effects */
         .particles {
-            position: fixed;
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
@@ -701,9 +701,6 @@
     </style>
 </head>
 <body>
-    <!-- Particle Effects -->
-    <div class="particles" id="particles"></div>
-
     <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
@@ -719,6 +716,8 @@
 
     <!-- Hero Section -->
     <section id="home" class="hero">
+        <!-- Particle Effects -->
+        <div class="particles" id="particles"></div>
         <div class="floating-elements">
             <div class="floating-element">🌱</div>
             <div class="floating-element">🌿</div>
