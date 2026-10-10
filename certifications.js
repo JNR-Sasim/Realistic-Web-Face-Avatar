@@ -42,4 +42,12 @@ window.CERTIFICATIONS = [
     verify: "https://learn.microsoft.com/api/credentials/share/en-us/FuthiJuniorSimelane-9377/46DC57A36492477B?sharingId=992634936C93972F"             // public share / verify link
   },
 
+  {
+    name:   "Prosci® Certified Change Practitioner",
+    issuer: "Prosci",
+    date:   "",            // add the date earned if you like
+    code:   "",
+    verify: "https://www.credly.com/badges/b4dca674-dd46-4056-8c1d-33d4ba133c50/public_url"
+  },
+
 ];

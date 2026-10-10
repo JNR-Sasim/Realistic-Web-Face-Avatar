@@ -167,6 +167,8 @@ body::after{
 .cert-logo .ms i:nth-child(2){background:#7fba00}
 .cert-logo .ms i:nth-child(3){background:#00a4ef}
 .cert-logo .ms i:nth-child(4){background:#ffb900}
+.cert-logo .badge-ico{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:5px;
+  font-size:.7rem;color:#50c0ff;background:rgba(80,192,255,.14);border:1px solid rgba(80,192,255,.35)}
 .cert-code{font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;color:#50c0ff;
   border:1px solid rgba(80,192,255,.3);padding:.2rem .55rem;border-radius:30px}
 .cert h3{font-family:var(--disp);font-weight:600;font-size:1.3rem;line-height:1.12;letter-spacing:-.01em}
@@ -510,10 +512,14 @@ document.documentElement.classList.add('js');
     const metaRow = `<div class="meta-row">${meta.join(' <span class="dot">•</span> ')}</div>`;
     const verify = c.verify
       ? `<a class="verify" href="${esc(c.verify)}" target="_blank" rel="noopener">Verify credential ↗</a>` : '';
+    const isMs = /microsoft/i.test(issuer);
+    const mark = isMs
+      ? '<span class="ms"><i></i><i></i><i></i><i></i></span>'
+      : '<span class="badge-ico">◆</span>';
     return `
       <div class="cert reveal">
         <div class="cert-top">
-          <span class="cert-logo"><span class="ms"><i></i><i></i><i></i><i></i></span> ${issuer}</span>
+          <span class="cert-logo">${mark} ${issuer}</span>
           ${code}
         </div>
         <h3>${esc(c.name)}</h3>
