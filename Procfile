@@ -1,1 +1,0 @@
-web: uvicorn ai_property_valuation.api:app --host 0.0.0.0 --port $PORT
