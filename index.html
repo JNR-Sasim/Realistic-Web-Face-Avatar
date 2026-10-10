@@ -135,6 +135,68 @@ body::after{
   letter-spacing:-.01em;line-height:1}
 .sec-head .meta{margin-left:auto;font-size:.7rem;color:var(--faint);letter-spacing:.06em}
 
+/* CREDENTIALS */
+.cert-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.2rem}
+.cert{position:relative;display:flex;flex-direction:column;gap:.9rem;
+  background:linear-gradient(160deg,var(--panel-2),var(--panel));
+  border:1px solid rgba(80,192,255,.3);
+  border-radius:14px;padding:1.6rem;overflow:hidden;
+  transition:transform .3s,border-color .3s;
+  animation:certGlow 3.4s ease-in-out infinite}
+/* rotating conic glow ring — always on */
+.cert::after{content:"";position:absolute;inset:-45%;z-index:0;pointer-events:none;opacity:.5;
+  background:conic-gradient(from 0deg,transparent 0 50%,rgba(80,192,255,.55) 70%,rgba(79,209,192,.55) 84%,transparent 100%);
+  animation:certSpin 6s linear infinite}
+.cert > *{position:relative;z-index:1}
+.cert::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;z-index:2;
+  background:linear-gradient(90deg,#2b88d8,#50c0ff,#4fd1c0);
+  box-shadow:0 0 16px rgba(80,192,255,.9)}
+.cert:hover{transform:translateY(-6px);border-color:rgba(80,192,255,.7)}
+.cert:hover::after{opacity:.8}
+/* strong, always-on breathing glow */
+@keyframes certGlow{
+  0%,100%{box-shadow:0 0 22px -4px rgba(80,192,255,.4), 0 0 0 1px rgba(80,192,255,.25)}
+  50%{box-shadow:0 0 42px 2px rgba(80,192,255,.65), 0 0 0 1px rgba(80,192,255,.5)}
+}
+@keyframes certSpin{to{transform:rotate(360deg)}}
+.cert-top{display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.cert-logo{display:flex;align-items:center;gap:.5rem;font-size:.72rem;letter-spacing:.04em;color:var(--muted)}
+.cert-logo .ms{display:grid;grid-template-columns:9px 9px;grid-auto-rows:9px;gap:2px}
+.cert-logo .ms i{display:block;width:9px;height:9px}
+.cert-logo .ms i:nth-child(1){background:#f25022}
+.cert-logo .ms i:nth-child(2){background:#7fba00}
+.cert-logo .ms i:nth-child(3){background:#00a4ef}
+.cert-logo .ms i:nth-child(4){background:#ffb900}
+.cert-code{font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;color:#50c0ff;
+  border:1px solid rgba(80,192,255,.3);padding:.2rem .55rem;border-radius:30px}
+.cert h3{font-family:var(--disp);font-weight:600;font-size:1.3rem;line-height:1.12;letter-spacing:-.01em}
+.cert .meta-row{display:flex;align-items:center;gap:.6rem;font-size:.72rem;color:var(--faint);margin-top:auto}
+.cert .meta-row .dot{color:var(--line-2)}
+.cert .verify{margin-top:.4rem;align-self:flex-start;font-family:var(--mono);font-size:.72rem;
+  color:#50c0ff;border-bottom:1px solid rgba(80,192,255,.4);padding-bottom:1px;transition:color .2s}
+.cert .verify:hover{color:#8fd6ff}
+.cert-empty{color:var(--faint);font-family:var(--mono);font-size:.82rem;border:1px dashed var(--line-2);
+  border-radius:14px;padding:2rem;text-align:center}
+
+/* cloud highlight banner */
+.cloud-banner{position:relative;overflow:hidden;margin-bottom:1.6rem;border-radius:16px;
+  border:1px solid rgba(80,192,255,.28);padding:1.8rem 1.9rem;
+  background:
+    radial-gradient(ellipse 60% 120% at 100% 0%, rgba(80,192,255,.14), transparent 60%),
+    linear-gradient(160deg,var(--panel-2),var(--panel))}
+.cloud-banner::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,#2b88d8,#50c0ff,#4fd1c0)}
+.cloud-banner .cb-tag{display:inline-flex;align-items:center;gap:.5rem;font-family:var(--mono);
+  font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:#50c0ff;margin-bottom:.9rem}
+.cloud-banner .cb-tag svg{width:16px;height:16px;fill:#50c0ff}
+.cloud-banner p{font-family:var(--serif);font-size:1.18rem;line-height:1.55;color:var(--text);
+  max-width:68ch;margin:0 0 1rem}
+.cloud-banner p b{color:#8fd6ff;font-style:normal}
+.cloud-skills{display:flex;flex-wrap:wrap;gap:.5rem}
+.cloud-skills span{font-family:var(--mono);font-size:.66rem;letter-spacing:.04em;color:var(--muted);
+  border:1px solid var(--line-2);border-radius:30px;padding:.32rem .7rem;transition:all .2s}
+.cloud-skills span:hover{color:#50c0ff;border-color:rgba(80,192,255,.4)}
+
 /* ABOUT */
 .about-grid{display:grid;grid-template-columns:1.35fr .85fr;gap:3rem;align-items:start}
 .about-text p{font-family:var(--serif);font-size:1.3rem;line-height:1.55;color:var(--muted);
@@ -247,8 +309,9 @@ body::after{
     <ul class="nav-links">
       <li><a href="#home"><span class="n">00</span>Index</a></li>
       <li><a href="#about"><span class="n">01</span>Profile</a></li>
-      <li><a href="#projects"><span class="n">02</span>Works</a></li>
-      <li><a href="#contact"><span class="n">03</span>Contact</a></li>
+      <li><a href="#certs"><span class="n">02</span>Certs</a></li>
+      <li><a href="#projects"><span class="n">03</span>Works</a></li>
+      <li><a href="#contact"><span class="n">04</span>Contact</a></li>
     </ul>
   </div>
 </nav>
@@ -284,7 +347,7 @@ body::after{
   <div class="about-grid">
     <div class="about-text reveal">
       <p>I'm a <b>software developer</b> rooted in applied mathematics and informatics. I'm drawn to problems with real <span class="hl">structure</span> — turning fuzzy ideas into systems that work and feel considered.</p>
-      <p>My work spans <b>web development</b>, <b>computer vision</b>, and modern software architecture: real-time face tracking with MediaPipe and Three.js, machine-learning services, trading automation, and interfaces built with intent rather than defaults.</p>
+      <p>My work spans <b>web development</b>, <b>computer vision</b>, and modern software architecture: real-time face tracking with MediaPipe, full-stack management systems on ASP.NET MVC with Entity Framework and SQL Server, and interfaces built with intent rather than defaults.</p>
       <p>I care about clean code, honest performance, and shipping.</p>
       <div class="skills-head">Toolset</div>
       <ul class="skills">
@@ -298,15 +361,46 @@ body::after{
       <div class="stat"><span class="num" data-count="4"></span><span class="lbl">Flagship projects shipped</span></div>
       <div class="stat"><span class="num" data-count="468"></span><span class="lbl">Face landmarks / frame</span></div>
       <div class="stat"><span class="num" data-count="30"><span class="u">+</span></span><span class="lbl">FPS real-time vision</span></div>
-      <div class="stat"><span class="num" data-count="3"></span><span class="lbl">Trading strategies built</span></div>
+      <div class="stat"><span class="num" data-count="3"></span><span class="lbl">Azure certifications earned</span></div>
     </aside>
+  </div>
+</section>
+
+<!-- ============ CREDENTIALS ============ -->
+<section class="section" id="certs">
+  <div class="sec-head reveal">
+    <span class="idx">02</span>
+    <h2>Credentials</h2>
+    <span class="meta">// verified certifications</span>
+  </div>
+
+  <div class="cloud-banner reveal">
+    <span class="cb-tag">
+      <svg viewBox="0 0 24 24"><path d="M19 18H6a4 4 0 0 1-.5-7.97A6 6 0 0 1 17.6 9.3 3.5 3.5 0 0 1 19 18Z"/></svg>
+      Cloud · Microsoft Azure
+    </span>
+    <div class="cloud-skills">
+      <span>Cloud Architecture</span>
+      <span>Containerization</span>
+      <span>Azure Container Apps</span>
+      <span>Azure Static Web Apps</span>
+      <span>Azure AI Foundry</span>
+      <span>Microsoft Graph</span>
+      <span>PostgreSQL</span>
+      <span>Full-Stack Delivery</span>
+      <span>API Integration</span>
+    </div>
+  </div>
+
+  <div class="cert-grid" id="certGrid" data-reveal>
+    <!-- cards injected from certifications.js -->
   </div>
 </section>
 
 <!-- ============ PROJECTS ============ -->
 <section class="section" id="projects">
   <div class="sec-head reveal">
-    <span class="idx">02</span>
+    <span class="idx">03</span>
     <h2>Selected Works</h2>
     <span class="meta">// 04 builds on record</span>
   </div>
@@ -315,8 +409,8 @@ body::after{
     <a class="proj reveal" href="realistic_web_avatar.html">
       <div class="ptop"><span class="pno">P-01</span><span class="pcat">Vision</span></div>
       <h3>Realistic Face Avatar</h3>
-      <p>3D face tracking with MediaPipe and Three.js — real-time expression mapping and realistic rendering, right in the browser.</p>
-      <div class="ptags"><span>MediaPipe</span><span>Three.js</span><span>WebGL</span></div>
+      <p>Real-time face tracking with MediaPipe — a live 468-point mesh with expression analysis, rendered on canvas entirely in the browser. Nothing leaves your device.</p>
+      <div class="ptags"><span>MediaPipe</span><span>Canvas</span><span>JavaScript</span></div>
       <div class="pfoot">
         <span class="open">Live demo <span class="a">↗</span></span>
         <a class="src" href="https://github.com/JNR-Sasim/Realistic-Web-Face-Avatar" target="_blank" rel="noopener" onclick="event.stopPropagation()">source</a>
@@ -362,7 +456,7 @@ body::after{
 <!-- ============ CONTACT ============ -->
 <section class="section" id="contact">
   <div class="sec-head reveal">
-    <span class="idx">03</span>
+    <span class="idx">04</span>
     <h2>Get In Touch</h2>
     <span class="meta">// let's build something</span>
   </div>
@@ -389,8 +483,45 @@ body::after{
   </div>
 </footer>
 
+<script src="certifications.js"></script>
 <script>
 document.documentElement.classList.add('js');
+
+/* render certifications from certifications.js */
+(function renderCerts(){
+  const grid = document.getElementById('certGrid');
+  if (!grid) return;
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const list = (window.CERTIFICATIONS || []).filter(c =>
+    c && c.name && !/goes here/i.test(c.name));
+
+  if (!list.length){
+    grid.innerHTML = '<div class="cert-empty">No certifications added yet — edit <b>certifications.js</b> to list them here.</div>';
+    return;
+  }
+
+  grid.innerHTML = list.map(c => {
+    const issuer = esc(c.issuer || 'Microsoft');
+    const code = c.code ? `<span class="cert-code">${esc(c.code)}</span>` : '';
+    const meta = [];
+    if (c.date) meta.push(esc(c.date));
+    meta.push(issuer);
+    const metaRow = `<div class="meta-row">${meta.join(' <span class="dot">•</span> ')}</div>`;
+    const verify = c.verify
+      ? `<a class="verify" href="${esc(c.verify)}" target="_blank" rel="noopener">Verify credential ↗</a>` : '';
+    return `
+      <div class="cert reveal">
+        <div class="cert-top">
+          <span class="cert-logo"><span class="ms"><i></i><i></i><i></i><i></i></span> ${issuer}</span>
+          ${code}
+        </div>
+        <h3>${esc(c.name)}</h3>
+        ${metaRow}
+        ${verify}
+      </div>`;
+  }).join('');
+})();
 
 /* nav scroll */
 const navbar = document.getElementById('navbar');
