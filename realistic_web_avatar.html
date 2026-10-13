@@ -194,9 +194,9 @@ button:disabled{opacity:.4;cursor:not-allowed;transform:none!important;box-shado
   </div>
 </div>
 
-<!-- MediaPipe (classic global build) -->
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+<!-- MediaPipe (pinned versions so WASM/data assets resolve reliably) -->
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3.1675466862/camera_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4.1633559619/face_mesh.js" crossorigin="anonymous"></script>
 
 <!-- Three.js as ES module -->
 <script type="importmap">
@@ -245,31 +245,52 @@ const fill = new THREE.DirectionalLight(0xf0a848, 1.0); fill.position.set(0,-2,2
 /* face group (so we can center it) */
 const faceGroup = new THREE.Group(); scene.add(faceGroup);
 
-/* geometry + materials, built once we know the tessellation */
-let geom, surfMesh, wireMesh, pointsMesh;
-let indices = null;
+/* geometry + materials — surface geom (triangles) + line geom (edges) + points */
+const VERTS = 478;                 // refineLandmarks adds iris pts (468 → 478)
+let geom, lineGeom, surfMesh, wireLines, pointsMesh, built=false;
 
-function buildMesh(vertexCount){
+function buildMesh(){
+  if(built) return;
+  // shared position buffer
+  const posAttr = new THREE.BufferAttribute(new Float32Array(VERTS*3), 3);
+
+  // --- surface (triangles from tessellation edges, best-effort) ---
   geom = new THREE.BufferGeometry();
-  geom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(vertexCount*3), 3));
-  if (indices) geom.setIndex(indices);
+  geom.setAttribute('position', posAttr);
+  const tess = window.FACEMESH_TESSELATION;
+  if (tess && tess.length){
+    const tri = [];
+    for(const t of triFromEdges(tess)){ tri.push(t[0],t[1],t[2]); }
+    if(tri.length) geom.setIndex(tri);
+  }
   geom.computeVertexNormals();
-
   const surfMat = new THREE.MeshStandardMaterial({
-    color:0x1b2740, metalness:.25, roughness:.55,
-    emissive:0x0a1830, emissiveIntensity:.4,
-    flatShading:false, side:THREE.DoubleSide, transparent:true, opacity:.96
+    color:0x24324f, metalness:.2, roughness:.55, emissive:0x0b1a33, emissiveIntensity:.45,
+    side:THREE.DoubleSide, transparent:true, opacity:.95
   });
   surfMesh = new THREE.Mesh(geom, surfMat);
 
-  const wireMat = new THREE.MeshBasicMaterial({color:0x4fd1c0, wireframe:true, transparent:true, opacity:.28});
-  wireMesh = new THREE.Mesh(geom, wireMat);
+  // --- wireframe as LineSegments straight from the edge list (always reliable) ---
+  lineGeom = new THREE.BufferGeometry();
+  lineGeom.setAttribute('position', posAttr);        // shares the same vertices
+  if (tess && tess.length){
+    const edges = [];
+    for(const [a,b] of tess){ edges.push(a,b); }
+    lineGeom.setIndex(edges);
+  }
+  const lineMat = new THREE.LineBasicMaterial({color:0x4fd1c0, transparent:true, opacity:.45});
+  wireLines = new THREE.LineSegments(lineGeom, lineMat);
 
-  const ptMat = new THREE.PointsMaterial({color:0xf0a848, size:.012, sizeAttenuation:true, transparent:true, opacity:.9});
-  pointsMesh = new THREE.Points(geom, ptMat);
+  // --- points ---
+  const ptGeom = new THREE.BufferGeometry();
+  ptGeom.setAttribute('position', posAttr);
+  const ptMat = new THREE.PointsMaterial({color:0xf0a848, size:.015, sizeAttenuation:true, transparent:true, opacity:.95});
+  pointsMesh = new THREE.Points(ptGeom, ptMat);
 
-  faceGroup.add(surfMesh, wireMesh, pointsMesh);
-  el('landmarkCount').textContent = vertexCount;
+  faceGroup.add(surfMesh, wireLines, pointsMesh);
+  surfMesh.visible = showSurface;
+  wireLines.visible = showWire;
+  built = true;
 }
 
 /* resize to the frame */
@@ -295,16 +316,20 @@ el('startBtn').onclick = start;
 el('stopBtn').onclick = stop;
 el('shotBtn').onclick = shot;
 el('surfToggle').onclick = () => { showSurface=!showSurface; el('surfToggle').classList.toggle('on'); if(surfMesh) surfMesh.visible=showSurface; };
-el('wireToggle').onclick = () => { showWire=!showWire; el('wireToggle').classList.toggle('on'); if(wireMesh) wireMesh.visible=showWire; };
+el('wireToggle').onclick = () => { showWire=!showWire; el('wireToggle').classList.toggle('on'); if(wireLines) wireLines.visible=showWire; };
 el('spinToggle').onclick = () => { autoSpin=!autoSpin; el('spinToggle').classList.toggle('on'); };
 
 async function start(){
   if(running) return;
   camMsg.textContent='Requesting camera…';
   try{
-    faceMesh = new FaceMesh({locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${f}`});
+    if (typeof FaceMesh === 'undefined'){
+      throw new Error('MediaPipe failed to load. Check your network / ad-blocker and reload.');
+    }
+    faceMesh = new FaceMesh({locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4.1633559619/${f}`});
     faceMesh.setOptions({maxNumFaces:1,refineLandmarks:true,minDetectionConfidence:.5,minTrackingConfidence:.5});
     faceMesh.onResults(onResults);
+    buildMesh();   // build the 3D geometry up front (don't wait for first frame)
     camera = new Camera(video,{
       onFrame:async()=>{ if(running){ const t=performance.now(); await faceMesh.send({image:video});
         el('processingTime').textContent=Math.round(performance.now()-t)+'ms'; } },
@@ -317,8 +342,12 @@ async function start(){
     el('startBtn').disabled=true; el('stopBtn').disabled=false; el('shotBtn').disabled=false;
   }catch(err){
     console.error(err);
-    camMsg.textContent='Camera unavailable — check permissions and that no other app is using it.';
+    camMsg.textContent = /MediaPipe/.test(err.message)
+      ? err.message
+      : 'Camera unavailable — check permissions and that no other app is using it.';
     camOverlay.classList.remove('hide');
+    running=false;
+    el('startBtn').disabled=false;
   }
 }
 
@@ -340,15 +369,9 @@ function onResults(res){
     let lm = res.multiFaceLandmarks[0];
     lm = smoothLandmarks(lm);
 
-    // build tessellation index list the first time
-    if(!geom){
-      if(window.FACEMESH_TESSELATION){
-        indices = [];
-        for(const [a,b,c] of triFromEdges(window.FACEMESH_TESSELATION)){ indices.push(a,b,c); }
-      }
-      buildMesh(lm.length);
-    }
+    if(!built) buildMesh();
     updateGeometry(lm);
+    el('landmarkCount').textContent = lm.length;
 
     const ex = analyzeExpression(lm);
     el('expression').textContent = cap(ex.expression);
@@ -387,23 +410,24 @@ function triFromEdges(edges){
   return tris;
 }
 
-/* map MediaPipe normalized coords → centered 3D space */
+/* map MediaPipe normalized coords → centered 3D space.
+   All three meshes share the same position buffer, so one write updates them all. */
 function updateGeometry(lm){
   const pos = geom.attributes.position.array;
-  // compute centroid for centering
   let cx=0, cy=0, cz=0;
   for(const p of lm){ cx+=p.x; cy+=p.y; cz+=p.z; }
   cx/=lm.length; cy/=lm.length; cz/=lm.length;
 
-  const S = 3.2;             // scale
+  const S = 3.2;
   for(let i=0;i<lm.length;i++){
     const p = lm[i];
-    //  x: mirror so it matches the mirrored camera; y: flip (screen→3D up); z: depth
-    pos[i*3]   = -(p.x - cx) * S;
-    pos[i*3+1] = -(p.y - cy) * S;
-    pos[i*3+2] = -(p.z - cz) * S * 1.6;   // exaggerate depth a touch
+    pos[i*3]   = -(p.x - cx) * S;          // mirror X
+    pos[i*3+1] = -(p.y - cy) * S;          // flip Y (screen → 3D up)
+    pos[i*3+2] = -(p.z - cz) * S * 1.6;    // real depth, slightly exaggerated
   }
   geom.attributes.position.needsUpdate = true;
+  if(lineGeom) lineGeom.attributes.position.needsUpdate = true;
+  if(pointsMesh) pointsMesh.geometry.attributes.position.needsUpdate = true;
   geom.computeVertexNormals();
   geom.computeBoundingSphere();
 }
