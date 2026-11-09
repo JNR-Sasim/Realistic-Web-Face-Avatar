@@ -151,7 +151,8 @@ body::after{
 .cert::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;z-index:2;
   background:linear-gradient(90deg,#2b88d8,#50c0ff,#4fd1c0);
   box-shadow:0 0 16px rgba(80,192,255,.9)}
-.cert:hover{transform:translateY(-6px);border-color:rgba(80,192,255,.7)}
+.cert:hover{transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(-6px);
+  border-color:rgba(80,192,255,.7)}
 .cert:hover::after{opacity:.8}
 /* strong, always-on breathing glow */
 @keyframes certGlow{
@@ -239,7 +240,8 @@ body::after{
 .proj::after{content:"";position:absolute;inset:0;border-radius:14px;pointer-events:none;
   background:radial-gradient(400px circle at var(--mx,50%) var(--my,0%),rgba(240,168,72,.1),transparent 60%);
   opacity:0;transition:opacity .3s}
-.proj:hover{transform:translateY(-5px);border-color:rgba(240,168,72,.4);
+.proj:hover{transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(-5px);
+  border-color:rgba(240,168,72,.4);
   box-shadow:0 24px 60px -24px rgba(0,0,0,.8)}
 .proj:hover::after{opacity:1}
 .proj .ptop{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.3rem}
@@ -277,6 +279,121 @@ body::after{
   flex-wrap:wrap;gap:1rem}
 .footer b{color:var(--amber)}
 
+/* ---------- INTRO CURTAIN (splits open on first visit) ---------- */
+.curtain{position:fixed;inset:0;z-index:3000}
+html.no-intro .curtain{display:none}
+.curtain-half{position:absolute;left:0;width:100%;height:50.2%;background:var(--bg)}
+.curtain-half.t{top:0;border-bottom:1px solid rgba(240,168,72,.55)}
+.curtain-half.b{bottom:0;border-top:1px solid rgba(240,168,72,.55)}
+.curtain-inner{position:absolute;inset:0;z-index:2;display:grid;place-content:center;justify-items:center;
+  gap:1.1rem;text-align:center}
+.curtain-name{font-family:var(--disp);font-weight:700;font-size:clamp(1.4rem,3.4vw,2.2rem);letter-spacing:-.01em}
+.curtain-name span{color:var(--amber)}
+.curtain-count{font-family:var(--mono);font-size:.78rem;letter-spacing:.2em;color:var(--muted)}
+.curtain-bar{width:min(240px,60vw);height:2px;background:var(--line-2);overflow:hidden}
+.curtain-bar span{display:block;height:100%;transform:scaleX(0);transform-origin:left;
+  background:linear-gradient(90deg,var(--amber),var(--teal))}
+html{scrollbar-gutter:stable}
+html.intro,html.intro body{overflow:hidden}
+html.intro .load{animation-play-state:paused}
+
+/* ---------- PAGE WIPE (when opening a demo page) ---------- */
+.wipe{position:fixed;inset:0;z-index:2500;pointer-events:none}
+.wipe span{position:absolute;inset:0;transform:scaleY(0);transform-origin:50% 0}
+.wipe .w1{background:var(--amber)}
+.wipe .w2{background:var(--bg)}
+
+/* ---------- CURSOR SPOTLIGHT ---------- */
+.spotlight{position:fixed;left:0;top:0;width:560px;height:560px;margin:-280px 0 0 -280px;border-radius:50%;
+  pointer-events:none;z-index:-1;opacity:0;
+  background:radial-gradient(circle,rgba(240,168,72,.10),rgba(79,209,192,.05) 45%,transparent 70%)}
+
+/* ---------- HERO GRAPHIC ---------- */
+.hero-art{position:absolute;inset:0;display:flex;align-items:center;justify-content:flex-end;
+  pointer-events:none;z-index:0}
+.hero-art-in{margin-right:.2rem}
+.gl-float{position:relative;animation:glFloat 8s ease-in-out infinite}
+@keyframes glFloat{0%,100%{transform:translateY(-6px)}50%{transform:translateY(8px)}}
+
+/* the git-graph card */
+.gitlog{position:relative;width:clamp(320px,34vw,440px);overflow:hidden;border-radius:14px;
+  border:1px solid var(--line-2);
+  background:linear-gradient(160deg,rgba(22,27,38,.93),rgba(12,15,21,.93));
+  box-shadow:0 30px 80px -30px rgba(0,0,0,.9),0 0 60px -22px rgba(240,168,72,.25);
+  transform:perspective(1000px) rotateX(var(--rx,0deg)) rotateY(var(--ry,-7deg));
+  transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+.gitlog::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;z-index:2;
+  background:linear-gradient(90deg,transparent,var(--amber),transparent);opacity:.75}
+.gl-bar{display:flex;align-items:center;gap:.4rem;padding:.7rem .9rem;border-bottom:1px solid var(--line);
+  font-family:var(--mono);font-size:.68rem;color:var(--muted);letter-spacing:.03em}
+.gl-bar i{width:9px;height:9px;border-radius:50%;background:#ff5a47}
+.gl-bar i:nth-child(2){background:#f0a848}
+.gl-bar i:nth-child(3){background:#46c86a}
+.gl-bar span{margin-left:.6rem}
+.gl-body{position:relative;padding:.5rem 0}
+.gl-svg{position:absolute;left:0;top:.5rem;overflow:visible}
+.gl-list{list-style:none;position:relative;margin:0;padding:0}
+.gl-row{height:38px;display:flex;align-items:center;gap:.55rem;padding:0 1rem 0 98px;white-space:nowrap;
+  font-family:var(--mono);font-size:.72rem;color:var(--muted);transition:color .2s;
+  animation:glRow .5s ease backwards}
+.gl-row:hover{color:var(--text)}
+.gl-hash{flex:none;color:var(--faint);font-size:.64rem}
+.gl-msg{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.gl-ref{flex:none;font-size:.58rem;letter-spacing:.03em;padding:.12rem .45rem;border-radius:30px;border:1px solid}
+.gl-ref.head{color:#1a1206;background:var(--amber);border-color:var(--amber);font-weight:500}
+.gl-ref.blue{color:#50c0ff;border-color:rgba(80,192,255,.45)}
+.gl-ref.teal{color:var(--teal);border-color:rgba(79,209,192,.45)}
+@keyframes glRow{from{opacity:0;transform:translateX(-10px)}}
+
+/* build-up: the history draws itself oldest -> newest (backwards fill = visible by default / reduced motion) */
+.gl-edge{fill:none;stroke-width:2;stroke-linecap:round;stroke-dasharray:1;animation:glDraw .5s ease-in-out backwards}
+@keyframes glDraw{from{stroke-dashoffset:1}}
+.gl-node{transform-box:fill-box;transform-origin:center;transition:transform .2s;
+  animation:glPop .45s cubic-bezier(.3,1.6,.5,1) backwards}
+@keyframes glPop{from{transform:scale(0)}}
+.gl-node.on{transform:scale(1.35)}
+.gl-ring{fill:none;stroke:#f0a848;stroke-width:1.5;opacity:.35;transform-box:fill-box;transform-origin:center;
+  animation:glRing 2.4s ease-out infinite}
+@keyframes glRing{0%{transform:scale(1);opacity:.75}100%{transform:scale(2.7);opacity:0}}
+html.intro .gitlog *{animation-play-state:paused}
+@media (max-width:1300px){.gl-hash{display:none}}
+.hero-inner{position:relative;z-index:1}
+
+/* ---------- SCROLL BAND (text that slides with the scroll) ---------- */
+.band{overflow:hidden;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  padding:1.1rem 0;margin:1rem 0 .5rem;display:grid;gap:.2rem;user-select:none}
+.band-row{display:flex;align-items:center;gap:2.2rem;width:max-content;white-space:nowrap;
+  font-family:var(--disp);font-weight:700;text-transform:uppercase;letter-spacing:-.02em;line-height:1;
+  font-size:clamp(2.4rem,7.5vw,6rem);will-change:transform}
+.band-row i{font-style:normal;color:var(--amber);font-size:.45em}
+.band-row.r1{color:transparent;-webkit-text-stroke:1px rgba(231,236,245,.38)}
+.band-row.r2{color:var(--text);opacity:.92}
+
+/* ---------- PROJECT LINE-ART ICONS (draw themselves) ---------- */
+.proj .pico{position:absolute;right:1rem;bottom:3.6rem;width:112px;height:112px;z-index:0;
+  color:var(--amber);opacity:.2;pointer-events:none;fill:none;stroke:currentColor;stroke-width:1.4;
+  stroke-linecap:round;stroke-linejoin:round;transition:opacity .4s,transform .6s}
+.proj:hover .pico{opacity:.5;transform:scale(1.07) rotate(-3deg)}
+.proj .ptop,.proj h3,.proj p,.proj .ptags,.proj .pfoot{position:relative;z-index:1}
+html.gsap .pico *{stroke-dasharray:1}
+/* card = <article>; one transparent link covers it, the "source" link sits above that link */
+.proj-hit{position:absolute;inset:0;z-index:2;border-radius:14px}
+.proj-hit:focus-visible{outline:2px solid var(--amber);outline-offset:-2px}
+.pfoot .src{position:relative;z-index:3}
+
+/* SCROLL-DRIVEN (GSAP) */
+.scroll-progress{position:fixed;top:0;left:0;width:100%;height:3px;z-index:1100;pointer-events:none;
+  transform:scaleX(0);transform-origin:0 50%;
+  background:linear-gradient(90deg,var(--amber),#ffd79b,var(--teal));
+  box-shadow:0 0 12px rgba(240,168,72,.6)}
+/* section heading underline that "draws" in (GSAP animates --line) */
+.sec-head{position:relative}
+.sec-head::after{content:"";position:absolute;left:0;bottom:-1px;width:100%;height:2px;
+  background:linear-gradient(90deg,var(--amber),var(--teal) 45%,transparent);
+  transform:scaleX(var(--line,1));transform-origin:left}
+.nav-links a.active{color:var(--text)}
+.nav-links a.active::after{width:100%}
+
 /* MOTION */
 @keyframes rise{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
 .load{opacity:0;animation:rise .85s cubic-bezier(.2,.7,.2,1) forwards}
@@ -294,6 +411,7 @@ body::after{
   .about-grid,.contact-grid{grid-template-columns:1fr;gap:2rem}
   .proj-grid{grid-template-columns:1fr}
   .hero-meta{display:none}
+  .hero-art{display:none}
 }
 @media (max-width:640px){
   .nav-links{display:none}
@@ -301,8 +419,32 @@ body::after{
   .section{padding:4rem 1.3rem}
 }
 </style>
+<noscript><style>.curtain,.wipe,.spotlight{display:none}</style></noscript>
+<script>
+/* Intro curtain: shown once per browser session. Added before first paint; failsafe clears it. */
+(function(){
+  var r = document.documentElement, seen = false;
+  try { seen = !!sessionStorage.getItem('introSeen'); } catch(e){}
+  if (seen) { r.classList.add('no-intro'); return; }
+  r.classList.add('intro');
+  setTimeout(function(){ r.classList.remove('intro'); r.classList.add('no-intro'); }, 6000);
+})();
+</script>
 </head>
 <body>
+
+<div class="curtain" id="curtain" aria-hidden="true">
+  <div class="curtain-half t"></div>
+  <div class="curtain-half b"></div>
+  <div class="curtain-inner">
+    <div class="curtain-name">F. <span>Simelane</span></div>
+    <div class="curtain-bar"><span id="curtainBar"></span></div>
+    <div class="curtain-count"><span id="curtainNum">0</span>%</div>
+  </div>
+</div>
+<div class="wipe" id="wipe" aria-hidden="true"><span class="w1"></span><span class="w2"></span></div>
+<div class="spotlight" id="spotlight" aria-hidden="true"></div>
+<div class="scroll-progress" id="scrollProgress"></div>
 
 <!-- ============ NAV ============ -->
 <nav class="navbar" id="navbar">
@@ -320,7 +462,16 @@ body::after{
 
 <!-- ============ HERO ============ -->
 <header class="hero" id="home">
-  <div class="hero-inner">
+  <div class="hero-art" aria-hidden="true">
+    <div class="hero-art-in">
+      <div class="gl-float">
+        <div class="gitlog" id="gitlogWrap">
+          <div class="gl-bar"><i></i><i></i><i></i><span>git log --graph --oneline</span></div>
+          <div class="gl-body" id="gitlog"></div>
+        </div>
+      </div>
+    </div>
+  </div><div class="hero-inner">
     <div class="status load d1"><span class="live"></span> Available for work — based in ZA</div>
     <h1>
       <span class="l1 load d2">Futhi Jr</span>
@@ -338,6 +489,12 @@ body::after{
     <b>focus:</b> web · vision · ml
   </aside>
 </header>
+
+<!-- ============ SCROLL BAND ============ -->
+<div class="band" aria-hidden="true">
+  <div class="band-row r1"></div>
+  <div class="band-row r2"></div>
+</div>
 
 <!-- ============ ABOUT ============ -->
 <section class="section" id="about">
@@ -408,49 +565,76 @@ body::after{
   </div>
   <div class="proj-grid">
 
-    <a class="proj reveal" href="realistic_web_avatar.html">
+    <article class="proj reveal">
+      <a class="proj-hit" href="realistic_web_avatar.html" aria-label="Open the Realistic Face Avatar demo"></a>
+      <svg class="pico" viewBox="0 0 100 100" aria-hidden="true">
+        <ellipse cx="50" cy="50" rx="26" ry="34"/>
+        <path d="M24 50 L50 16 L76 50 L50 84 Z"/>
+        <path d="M24 50 H76 M50 16 V84"/>
+        <path d="M34 42 q6 -5 12 0"/><path d="M54 42 q6 -5 12 0"/>
+        <path d="M50 44 L46 58 L54 58"/><path d="M40 68 q10 7 20 0"/>
+      </svg>
       <div class="ptop"><span class="pno">P-01</span><span class="pcat">Vision</span></div>
       <h3>Realistic Face Avatar</h3>
       <p>Real-time face tracking with MediaPipe, reconstructed as a live 3D mesh in Three.js — real depth, lighting and orbit controls, running entirely in the browser. Nothing leaves your device.</p>
       <div class="ptags"><span>MediaPipe</span><span>Three.js</span><span>WebGL</span></div>
       <div class="pfoot">
         <span class="open">Live demo <span class="a">↗</span></span>
-        <a class="src" href="https://github.com/JNR-Sasim/Realistic-Web-Face-Avatar" target="_blank" rel="noopener" onclick="event.stopPropagation()">source</a>
+        <a class="src" href="https://github.com/JNR-Sasim/Realistic-Web-Face-Avatar" target="_blank" rel="noopener">source</a>
       </div>
-    </a>
+    </article>
 
-    <a class="proj reveal" href="ecommerce.html">
+    <article class="proj reveal">
+      <a class="proj-hit" href="ecommerce.html" aria-label="Open the E-commerce Showcase demo"></a>
+      <svg class="pico" viewBox="0 0 100 100" aria-hidden="true">
+        <path d="M10 20 H24 L34 62 H78 L88 32 H28"/>
+        <circle cx="40" cy="76" r="6"/><circle cx="72" cy="76" r="6"/>
+        <path d="M44 34 V54 M58 34 V54 M72 34 V54"/>
+      </svg>
       <div class="ptop"><span class="pno">P-02</span><span class="pcat">Web</span></div>
       <h3>E-commerce Showcase</h3>
       <p>A modern storefront with catalogue, cart, search and responsive layout — vanilla JavaScript, hand-written CSS, no framework overhead.</p>
       <div class="ptags"><span>Vanilla JS</span><span>CSS</span><span>UX</span></div>
       <div class="pfoot">
         <span class="open">Live demo <span class="a">↗</span></span>
-        <a class="src" href="https://github.com/JNR-Sasim/Realistic-Web-Face-Avatar" target="_blank" rel="noopener" onclick="event.stopPropagation()">source</a>
+        <a class="src" href="https://github.com/JNR-Sasim/Realistic-Web-Face-Avatar" target="_blank" rel="noopener">source</a>
       </div>
-    </a>
+    </article>
 
-    <a class="proj reveal" href="greengarden-pro.html">
+    <article class="proj reveal">
+      <a class="proj-hit" href="greengarden-pro.html" aria-label="Open the GreenGarden Pro demo"></a>
+      <svg class="pico" viewBox="0 0 100 100" aria-hidden="true">
+        <path d="M50 90 V44"/>
+        <path d="M50 62 C30 62 20 48 20 30 C38 30 50 42 50 62 Z"/>
+        <path d="M50 50 C68 50 80 38 80 20 C62 20 50 32 50 50 Z"/>
+        <path d="M26 90 H74"/>
+      </svg>
       <div class="ptop"><span class="pno">P-03</span><span class="pcat">Motion</span></div>
       <h3>GreenGarden Pro</h3>
       <p>A garden-tools concept site driven by GSAP, glassmorphism, particles and a crafted dark theme — a showpiece for motion and detail.</p>
       <div class="ptags"><span>GSAP</span><span>Animation</span><span>Dark UI</span></div>
       <div class="pfoot">
         <span class="open">Live demo <span class="a">↗</span></span>
-        <a class="src" href="https://github.com/JNR-Sasim/Realistic-Web-Face-Avatar" target="_blank" rel="noopener" onclick="event.stopPropagation()">source</a>
+        <a class="src" href="https://github.com/JNR-Sasim/Realistic-Web-Face-Avatar" target="_blank" rel="noopener">source</a>
       </div>
-    </a>
+    </article>
 
-    <a class="proj reveal" href="https://github.com/JNR-Sasim/-VehicleLeasingManagementSystem" target="_blank" rel="noopener">
+    <article class="proj reveal">
+      <a class="proj-hit" href="https://github.com/JNR-Sasim/-VehicleLeasingManagementSystem" target="_blank" rel="noopener" aria-label="View the Vehicle Leasing Management System code on GitHub"></a>
+      <svg class="pico" viewBox="0 0 100 100" aria-hidden="true">
+        <path d="M8 66 V54 L20 40 H64 L80 54 H92 V66 Z"/>
+        <path d="M26 54 L34 44 H60 L70 54"/>
+        <circle cx="28" cy="68" r="8"/><circle cx="72" cy="68" r="8"/>
+      </svg>
       <div class="ptop"><span class="pno">P-04</span><span class="pcat">Full-Stack</span></div>
       <h3>Vehicle Leasing Management System</h3>
       <p>A fleet-management platform for vehicle leasing — managing vehicles, suppliers, branches, clients and drivers with a dashboard of live fleet analytics. Built on ASP.NET MVC with Entity Framework and SQL Server.</p>
       <div class="ptags"><span>C#</span><span>ASP.NET MVC</span><span>EF / SQL Server</span></div>
       <div class="pfoot">
         <span class="open">View code <span class="a">↗</span></span>
-        <a class="src" href="https://github.com/JNR-Sasim/-VehicleLeasingManagementSystem" target="_blank" rel="noopener" onclick="event.stopPropagation()">source</a>
+        <a class="src" href="https://github.com/JNR-Sasim/-VehicleLeasingManagementSystem" target="_blank" rel="noopener">source</a>
       </div>
-    </a>
+    </article>
 
   </div>
 </section>
@@ -485,6 +669,8 @@ body::after{
   </div>
 </footer>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 <script src="certifications.js"></script>
 <script>
 document.documentElement.classList.add('js');
@@ -541,34 +727,381 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
   });
 });
 
-/* reveal on scroll */
-const io = new IntersectionObserver((entries) => {
-  entries.forEach(en => { if (en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target); } });
-}, {threshold:.12, rootMargin:'0px 0px -40px 0px'});
-document.querySelectorAll('.reveal').forEach(el => io.observe(el));
-window.addEventListener('load', () => setTimeout(() => {
-  document.querySelectorAll('.reveal:not(.in)').forEach(el => {
-    if (el.getBoundingClientRect().top < window.innerHeight) el.classList.add('in');
-  });
-}, 400));
+/* ============================================================
+   MOTION — GSAP + ScrollTrigger (with a no-GSAP fallback)
+   ============================================================ */
+/* ---------- hero graphic: an animated `git log --graph` of the work in this portfolio ---------- */
+function initGitGraph(){
+  const root = document.getElementById('gitlog'), wrap = document.getElementById('gitlogWrap');
+  if (!root || !wrap) return;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const fine = matchMedia('(pointer:fine)').matches;
 
-/* animated counters */
-const cio = new IntersectionObserver((entries) => {
-  entries.forEach(en => {
-    if (!en.isIntersecting) return;
-    const el = en.target, target = +el.dataset.count;
-    const unit = el.querySelector('.u'); const unitHTML = unit ? unit.outerHTML : '';
-    const dur = 1200, start = performance.now();
-    (function step(now){
-      const p = Math.min((now - start)/dur, 1);
-      const eased = 1 - Math.pow(1 - p, 3);
-      el.innerHTML = Math.round(eased * target) + unitHTML;
-      if (p < 1) requestAnimationFrame(step);
-    })(start);
-    cio.unobserve(el);
+  const COL = ['#f0a848', '#50c0ff', '#4fd1c0'];            // main / feat/credentials / feat/web
+  const ROW = 38, X0 = 16, GAP = 24, H = ROW * 0.9;
+  // newest first. Hashes are decorative; the messages are the real milestones.
+  const C = [
+    {id:'H',  lane:0, p:['mD'],       msg:'Available for work',                 ref:['HEAD → main', 'head'],          hash:'e4b9a07'},
+    {id:'mD', lane:0, p:['mC', 'c4'],  msg:'Merge · 4 certifications earned',                                          hash:'9c21f3d', merge:true},
+    {id:'c4', lane:1, p:['c3'],       msg:'Prosci Change Practitioner',          ref:['feat/credentials', 'blue'],     hash:'7ad0e55'},
+    {id:'c3', lane:1, p:['c2'],       msg:'AZ-305 Solutions Architect Expert',                                         hash:'3f8b6c1'},
+    {id:'c2', lane:1, p:['c1'],       msg:'AZ-104 Administrator Associate',                                            hash:'b02e9a4'},
+    {id:'mC', lane:0, p:['mB'],       msg:'Vehicle Leasing Management System',                                         hash:'61d7c88'},
+    {id:'c1', lane:1, p:['mB'],       msg:'AZ-900 Azure Fundamentals',                                                 hash:'d5a413e'},
+    {id:'mB', lane:0, p:['r', 'w2'],   msg:'Face Avatar · MediaPipe + Three.js',                                       hash:'2e7f90b', merge:true},
+    {id:'w2', lane:2, p:['w1'],       msg:'GreenGarden Pro · GSAP',              ref:['feat/web', 'teal'],             hash:'a86c1d2'},
+    {id:'w1', lane:2, p:['r'],        msg:'E-commerce Showcase',                                                       hash:'48e0b5f'},
+    {id:'r',  lane:0, p:[],           msg:'Initial commit · Applied Maths',                                            hash:'0b3a7c9'}
+  ];
+  const n = C.length, idx = {};
+  C.forEach((c, i) => idx[c.id] = i);
+  const X = l => X0 + l * GAP, Y = i => i * ROW + ROW / 2;
+  const BASE = 0.35, STEP = 0.17;
+  const nodeDelay = i => BASE + (n - 1 - i) * STEP;           // oldest pops first
+
+  // edges, written parent -> child so the line "grows" up the history
+  const edges = [];
+  C.forEach((c, i) => c.p.forEach((pid, k) => {
+    const j = idx[pid], p = C[j];
+    const x1 = X(c.lane), y1 = Y(i), x2 = X(p.lane), y2 = Y(j);
+    let d, color;
+    if (x1 === x2){ d = `M${x2} ${y2}L${x1} ${y1}`; color = COL[c.lane]; }
+    else if (k > 0){                                         // merge: leave the merge commit sideways, then run down the other lane
+      d = `M${x2} ${y2}L${x2} ${y1 + H}C${x2} ${y1 + H * 0.45} ${x1} ${y1 + H * 0.55} ${x1} ${y1}`; color = COL[p.lane];
+    } else {                                                 // branch-off: run along own lane, then curve into the parent
+      const ya = y2 - H;
+      d = `M${x2} ${y2}C${x2} ${ya + H * 0.45} ${x1} ${ya + H * 0.55} ${x1} ${ya}L${x1} ${y1}`; color = COL[c.lane];
+    }
+    edges.push({d, color, delay: nodeDelay(j), dur: Math.max(0.3, (j - i) * STEP)});
+  }));
+
+  const W = X(2) + 14, SH = ROW * n;
+  let svg = `<svg class="gl-svg" width="${W}" height="${SH}" viewBox="0 0 ${W} ${SH}" aria-hidden="true">`;
+  edges.forEach(e => {
+    svg += `<path class="gl-edge" pathLength="1" d="${e.d}" stroke="${e.color}" style="animation-delay:${e.delay.toFixed(2)}s;animation-duration:${e.dur.toFixed(2)}s"/>`;
   });
-}, {threshold:.6});
-document.querySelectorAll('.num[data-count]').forEach(c => cio.observe(c));
+  C.forEach((c, i) => {
+    const x = X(c.lane), y = Y(i), col = COL[c.lane], head = c.id === 'H';
+    svg += `<g class="gl-node" data-i="${i}" style="animation-delay:${nodeDelay(i).toFixed(2)}s">`;
+    if (head) svg += `<circle class="gl-ring" cx="${x}" cy="${y}" r="7" style="animation-delay:${(nodeDelay(i) + 0.6).toFixed(2)}s"/>`;
+    svg += `<circle cx="${x}" cy="${y}" r="${head ? 6 : c.merge ? 6 : 5}" fill="${head ? col : '#0e1118'}" stroke="${col}" stroke-width="2"/>`;
+    if (c.merge) svg += `<circle cx="${x}" cy="${y}" r="2" fill="${col}"/>`;
+    svg += `</g>`;
+  });
+  if (!reduce){                                              // a light that keeps travelling up the main branch
+    const x = X(0), y0 = Y(n - 1), y1 = Y(0);
+    svg += `<g visibility="hidden"><set attributeName="visibility" to="visible" begin="5s"/>` +
+           `<circle r="9" fill="#f0a848" opacity=".22"/><circle r="3" fill="#fff3d6"/>` +
+           `<animateMotion dur="4.5s" begin="5s" repeatCount="indefinite" path="M${x} ${y0}L${x} ${y1}"/></g>`;
+  }
+  svg += `</svg>`;
+
+  const rows = C.map((c, i) =>
+    `<li class="gl-row" data-i="${i}" style="animation-delay:${(nodeDelay(i) + 0.08).toFixed(2)}s">` +
+    `<span class="gl-hash">${c.hash}</span>` +
+    (c.ref ? `<span class="gl-ref ${c.ref[1]}">${c.ref[0]}</span>` : '') +
+    `<span class="gl-msg">${c.msg}</span></li>`).join('');
+  root.innerHTML = svg + `<ul class="gl-list">${rows}</ul>`;
+
+  // hovering a commit row lights up its node
+  const nodes = root.querySelectorAll('.gl-node');
+  root.querySelectorAll('.gl-row').forEach(li => {
+    const node = nodes[+li.dataset.i];
+    li.addEventListener('mouseenter', () => node.classList.add('on'));
+    li.addEventListener('mouseleave', () => node.classList.remove('on'));
+  });
+
+  // gentle 3D tilt that follows the mouse
+  if (fine && !reduce) window.addEventListener('mousemove', e => {
+    const x = e.clientX / innerWidth - 0.5, y = e.clientY / innerHeight - 0.5;
+    wrap.style.setProperty('--ry', (-7 + x * 10) + 'deg');
+    wrap.style.setProperty('--rx', (-y * 8) + 'deg');
+  }, {passive:true});
+}
+initGitGraph();
+/* ---------- scroll band text ---------- */
+(function buildBand(){
+  const items = ['Web Development', 'Computer Vision', 'Cloud Architecture', 'Applied Mathematics', 'Machine Learning'];
+  const seq = items.map(t => `<span>${t}</span><i>✦</i>`).join('');
+  document.querySelectorAll('.band-row').forEach(row => { row.innerHTML = seq + seq + seq; });
+})();
+
+/* ---------- 3D tilt on cards (CSS does the easing; JS only feeds two variables) ---------- */
+function tilt(sel, max){
+  document.querySelectorAll(sel).forEach(card => {
+    card.addEventListener('mousemove', e => {
+      const r = card.getBoundingClientRect();
+      card.style.setProperty('--ry', ((e.clientX - r.left) / r.width - .5) * max + 'deg');
+      card.style.setProperty('--rx', -((e.clientY - r.top) / r.height - .5) * max + 'deg');
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.setProperty('--rx', '0deg'); card.style.setProperty('--ry', '0deg');
+    });
+  });
+}
+tilt('.proj', 6); tilt('.cert', 8);
+
+/* make the project icons drawable: normalise every stroke to length 1 */
+document.querySelectorAll('.pico *').forEach(el => el.setAttribute('pathLength', '1'));
+
+/* ---------- intro curtain: counts up, then splits open ---------- */
+function runIntro(){
+  const root = document.documentElement, curtain = document.getElementById('curtain');
+  const finish = () => {
+    root.classList.remove('intro'); root.classList.add('no-intro'); if (curtain) curtain.remove();
+    if (window.ScrollTrigger) ScrollTrigger.refresh();
+  };
+  if (!curtain || root.classList.contains('no-intro') ||
+      matchMedia('(prefers-reduced-motion: reduce)').matches){ finish(); return; }
+  try { sessionStorage.setItem('introSeen', '1'); } catch(e){}
+  const num = document.getElementById('curtainNum'), bar = document.getElementById('curtainBar');
+  const halves = curtain.querySelectorAll('.curtain-half'), inner = curtain.querySelector('.curtain-inner');
+  const o = {v:0};
+  gsap.timeline({onComplete: finish})
+    .to(o, {v:100, duration:1, ease:'power2.inOut',
+            onUpdate(){ num.textContent = Math.round(o.v); bar.style.transform = 'scaleX(' + o.v / 100 + ')'; }})
+    .to(inner, {opacity:0, y:-18, duration:.4, ease:'power2.in'}, '+=.08')
+    .add(() => root.classList.remove('intro'))            // unfreezes scroll + starts the hero's own load animation
+    .to(halves[0], {yPercent:-100, duration:.9, ease:'expo.inOut'}, '<')
+    .to(halves[1], {yPercent: 100, duration:.9, ease:'expo.inOut'}, '<');
+}
+
+const hasGSAP = typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined';
+
+/* Fallback if the GSAP CDN is blocked/offline: the original observer-based reveal + counters */
+function legacyMotion(){
+  // no GSAP: make sure the intro curtain can never block the page
+  document.documentElement.classList.remove('intro');
+  document.documentElement.classList.add('no-intro');
+  const cur = document.getElementById('curtain'); if (cur) cur.remove();
+
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(en => { if (en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target); } });
+  }, {threshold:.12, rootMargin:'0px 0px -40px 0px'});
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+  window.addEventListener('load', () => setTimeout(() => {
+    document.querySelectorAll('.reveal:not(.in)').forEach(el => {
+      if (el.getBoundingClientRect().top < window.innerHeight) el.classList.add('in');
+    });
+  }, 400));
+
+  const cio = new IntersectionObserver((entries) => {
+    entries.forEach(en => {
+      if (!en.isIntersecting) return;
+      const el = en.target, target = +el.dataset.count;
+      const unit = el.querySelector('.u'); const unitHTML = unit ? unit.outerHTML : '';
+      const dur = 1200, start = performance.now();
+      (function step(now){
+        const p = Math.min((now - start)/dur, 1);
+        const eased = 1 - Math.pow(1 - p, 3);
+        el.innerHTML = Math.round(eased * target) + unitHTML;
+        if (p < 1) requestAnimationFrame(step);
+      })(start);
+      cio.unobserve(el);
+    });
+  }, {threshold:.6});
+  document.querySelectorAll('.num[data-count]').forEach(c => cio.observe(c));
+}
+
+function gsapMotion(){
+  gsap.registerPlugin(ScrollTrigger);
+  document.documentElement.classList.add('gsap');
+  runIntro();
+
+  // GSAP now owns the scroll reveals: drop the CSS-driven hidden state
+  document.querySelectorAll('.reveal').forEach(el => el.classList.remove('reveal'));
+
+  // Release hero elements from their CSS load animation once it finishes,
+  // so GSAP can move them (a finished CSS animation would otherwise override GSAP)
+  document.querySelectorAll('.load').forEach(el => {
+    el.addEventListener('animationend', e => {
+      if (e.target === el && e.animationName === 'rise') el.classList.remove('load','d1','d2','d3','d4','d5','d6');
+    });
+  });
+
+  // tween helper: kills CSS transitions while animating (they fight GSAP), then hands control back
+  const A = (tl, targets, from, to, pos) => {
+    const els = gsap.utils.toArray(targets);
+    els.forEach(e => e.style.transition = 'none');
+    const tween = gsap.fromTo(els, from, Object.assign({}, to, {
+      clearProps: 'opacity,transform',
+      onComplete(){ els.forEach(e => e.style.transition = ''); }
+    }));
+    return tl.add(tween, pos);
+  };
+
+  // counters: show final values by default (works for reduced-motion), animate from 0 otherwise
+  const nums = gsap.utils.toArray('.num[data-count]');
+  nums.forEach(n => { const u = n.querySelector('.u'); n._unit = u ? u.outerHTML : ''; });
+  const setNum = (n, v) => { n.innerHTML = Math.round(v) + n._unit; };
+  nums.forEach(n => setNum(n, +n.dataset.count));
+
+  const mm = gsap.matchMedia();
+  mm.add('(prefers-reduced-motion: no-preference)', () => {
+
+    /* 1 — scroll progress bar */
+    gsap.fromTo('#scrollProgress', {scaleX:0}, {scaleX:1, ease:'none',
+      scrollTrigger:{trigger:document.documentElement, start:'top top', end:'bottom bottom', scrub:.3}});
+
+    /* 2 — hero parallax: content drifts up and fades as you scroll away */
+    // explicit start values (fromTo): the hero's CSS fade-in is still at opacity 0 when this runs,
+    // and a plain .to() would read that 0 as its starting point and leave the element invisible
+    gsap.fromTo('.hero-inner', {y:0, opacity:1}, {y:-80, opacity:.1, ease:'none',
+      scrollTrigger:{trigger:'.hero', start:'top top', end:'bottom top', scrub:.6}});
+    gsap.fromTo('.hero-meta', {y:0, opacity:1}, {y:-170, opacity:0, ease:'none',
+      scrollTrigger:{trigger:'.hero', start:'top top', end:'bottom top', scrub:.6}});
+
+    /* 3 — section headings: underline draws in, title wipes on */
+    gsap.utils.toArray('.sec-head').forEach(head => {
+      const idx = head.querySelector('.idx'), h2 = head.querySelector('h2'), meta = head.querySelector('.meta');
+      const tl = gsap.timeline({scrollTrigger:{trigger:head, start:'top 88%', once:true}});
+      tl.fromTo(head, {'--line':0}, {'--line':1, duration:1.1, ease:'power3.inOut'}, 0);
+      if (idx) A(tl, idx, {x:-16, opacity:0}, {x:0, opacity:1, duration:.5, ease:'power2.out'}, .05);
+      if (h2)  tl.fromTo(h2, {clipPath:'inset(0% 100% 0% 0%)', x:-24, opacity:0},
+                             {clipPath:'inset(-25% -10% -25% -10%)', x:0, opacity:1, duration:.9, ease:'power3.out',
+                              clearProps:'clipPath,opacity,transform'}, .12);
+      if (meta) A(tl, meta, {y:8, opacity:0}, {y:0, opacity:1, duration:.6, ease:'power2.out'}, .5);
+    });
+
+    /* 4 — profile: paragraphs, skill pills pop, stat panel slides in, numbers count up */
+    nums.forEach(n => setNum(n, 0));
+    const about = gsap.timeline({scrollTrigger:{trigger:'.about-grid', start:'top 78%', once:true}});
+    A(about, '.about-text p',   {y:36, opacity:0},          {y:0, opacity:1, duration:.8, stagger:.14, ease:'power3.out'}, 0);
+    A(about, '.skills-head',    {x:-14, opacity:0},         {x:0, opacity:1, duration:.5, ease:'power2.out'}, .45);
+    A(about, '.skills li',      {y:14, scale:.85, opacity:0}, {y:0, scale:1, opacity:1, duration:.45, stagger:.045, ease:'back.out(2)'}, .55);
+    A(about, '.panel',          {x:70, opacity:0},          {x:0, opacity:1, duration:.9, ease:'power3.out'}, .15);
+    A(about, '.panel .stat',    {x:24, opacity:0},          {x:0, opacity:1, duration:.5, stagger:.1, ease:'power2.out'}, .5);
+    about.add(() => {
+      nums.forEach(n => {
+        const o = {v:0}, target = +n.dataset.count;
+        gsap.to(o, {v:target, duration:1.6, ease:'power3.out', onUpdate:() => setNum(n, o.v)});
+      });
+    }, .6);
+
+    /* 5 — cloud banner + skill pills */
+    const cloud = gsap.timeline({scrollTrigger:{trigger:'.cloud-banner', start:'top 86%', once:true}});
+    A(cloud, '.cloud-banner',        {y:50, opacity:0, scale:.97}, {y:0, opacity:1, scale:1, duration:.9, ease:'power3.out'}, 0);
+    A(cloud, '.cloud-skills span',   {y:12, opacity:0},           {y:0, opacity:1, duration:.4, stagger:.05, ease:'power2.out'}, .3);
+
+    /* 6 — certificate cards rise in a staggered wave (batch = per-row stagger) */
+    const certs = gsap.utils.toArray('.cert');
+    if (certs.length){
+      certs.forEach(c => c.style.transition = 'none');
+      gsap.set(certs, {opacity:0, y:70, scale:.94});
+      ScrollTrigger.batch(certs, {
+        start:'top 90%', once:true,
+        onEnter: batch => gsap.to(batch, {opacity:1, y:0, scale:1, duration:.9, ease:'power3.out', stagger:.14,
+          clearProps:'opacity,transform', onComplete(){ batch.forEach(e => e.style.transition = ''); }})
+      });
+    }
+
+    /* 7 — project cards: lift in with a slight tilt, staggered */
+    const projs = gsap.utils.toArray('.proj');
+    if (projs.length){
+      projs.forEach(p => p.style.transition = 'none');
+      gsap.set(projs, {opacity:0, y:80, rotate:(i) => (i % 2 ? 1.5 : -1.5), scale:.95});
+      gsap.set('.pico *', {strokeDashoffset:1});                  // icons start undrawn
+      ScrollTrigger.batch(projs, {
+        start:'top 90%', once:true,
+        onEnter: batch => {
+          gsap.to(batch, {opacity:1, y:0, rotate:0, scale:1, duration:1, ease:'power3.out', stagger:.15,
+            clearProps:'opacity,transform', onComplete(){ batch.forEach(e => e.style.transition = ''); }});
+          // each card's line-art icon draws itself shortly after the card lands
+          batch.forEach((card, i) => gsap.to(card.querySelectorAll('.pico *'),
+            {strokeDashoffset:0, duration:1.6, ease:'power2.inOut', stagger:.08, delay:.35 + i * .15}));
+        }
+      });
+    }
+
+    /* 8 — contact: intro slides from the left, links cascade from the right */
+    const contact = gsap.timeline({scrollTrigger:{trigger:'.contact-grid', start:'top 82%', once:true}});
+    A(contact, '.contact-intro',    {x:-40, opacity:0}, {x:0, opacity:1, duration:.8, ease:'power3.out'}, 0);
+    A(contact, '.contact-list li',  {x:40, opacity:0},  {x:0, opacity:1, duration:.6, stagger:.1, ease:'power2.out'}, .2);
+
+    /* 9 — hero graphic: drifts up and grows slightly as you scroll away */
+    gsap.to('.hero-art-in', {y:-90, scale:1.12, ease:'none',
+      scrollTrigger:{trigger:'.hero', start:'top top', end:'bottom top', scrub:.6}});
+
+    /* 10 — scroll band: two rows slide in opposite directions, skewing with scroll speed */
+    // drift in pixels (not % of the very wide row): about half the scroll speed, so it reads as a gentle slide
+    const drift = () => 0.45 * (window.innerHeight + 260);
+    gsap.fromTo('.band-row.r1', {x:0},            {x:() => -drift(), ease:'none',
+      scrollTrigger:{trigger:'.band', start:'top bottom', end:'bottom top', scrub:1.2, invalidateOnRefresh:true}});
+    gsap.fromTo('.band-row.r2', {x:() => -drift()}, {x:0,            ease:'none',
+      scrollTrigger:{trigger:'.band', start:'top bottom', end:'bottom top', scrub:1.2, invalidateOnRefresh:true}});
+    const skews = gsap.utils.toArray('.band-row').map(r => gsap.quickTo(r, 'skewX', {duration:.7, ease:'power3'}));
+    ScrollTrigger.create({trigger:'.band', start:'top bottom', end:'bottom top',
+      onUpdate: self => { const v = gsap.utils.clamp(-3, 3, self.getVelocity() / -700); skews.forEach(s => s(v)); }});
+    ScrollTrigger.addEventListener('scrollEnd', () => skews.forEach(s => s(0)));
+
+    /* 11 — cursor spotlight (mouse devices only) */
+    if (matchMedia('(hover:hover) and (pointer:fine)').matches){
+      const spot = document.getElementById('spotlight');
+      if (spot){
+        const sx = gsap.quickTo(spot, 'x', {duration:.7, ease:'power3'});
+        const sy = gsap.quickTo(spot, 'y', {duration:.7, ease:'power3'});
+        let shown = false;
+        window.addEventListener('mousemove', e => {
+          sx(e.clientX); sy(e.clientY);
+          if (!shown){ shown = true; gsap.to(spot, {opacity:1, duration:.8}); }
+        }, {passive:true});
+      }
+    }
+
+    /* 12 — page wipe when opening a local demo page (amber sweep, then dark) */
+    const wipe = document.getElementById('wipe');
+    if (wipe){
+      const w = wipe.querySelectorAll('span');
+      gsap.set(w, {scaleY:0, transformOrigin:'50% 0%'});
+      document.addEventListener('click', e => {
+        const a = e.target.closest && e.target.closest('a[href]');
+        if (!a || e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+        const href = a.getAttribute('href');
+        if (!href || a.target === '_blank' || /^(#|mailto:|tel:|https?:|\/\/|javascript:)/i.test(href)) return;
+        e.preventDefault();
+        wipe.style.pointerEvents = 'all';
+        gsap.timeline({onComplete: () => { location.href = href; }})
+          .to(w[0], {scaleY:1, duration:.55, ease:'power3.inOut'})
+          .to(w[1], {scaleY:1, duration:.55, ease:'power3.inOut'}, .12);
+        setTimeout(() => { location.href = href; }, 1800);     // failsafe
+      });
+      // coming back with the browser's back button: reset the wipe
+      window.addEventListener('pageshow', e => {
+        if (e.persisted){ gsap.set(w, {scaleY:0}); wipe.style.pointerEvents = 'none'; }
+      });
+    }
+  });
+
+  /* nav scroll-spy (runs for everyone, no motion involved) */
+  ['home','about','certs','projects','contact'].forEach(id => {
+    ScrollTrigger.create({
+      trigger:'#' + id, start:'top 55%', end:'bottom 55%',
+      onToggle: self => { if (self.isActive) document.querySelectorAll('.nav-links a').forEach(a =>
+        a.classList.toggle('active', a.getAttribute('href') === '#' + id)); }
+    });
+  });
+
+  // layout can shift after fonts/images settle
+  window.addEventListener('load', () => ScrollTrigger.refresh());
+}
+
+if (hasGSAP){
+  try { gsapMotion(); }
+  catch (err) {
+    // never leave content hidden if something goes wrong
+    console.error('GSAP motion failed, falling back:', err);
+    try { ScrollTrigger.getAll().forEach(t => t.kill()); gsap.globalTimeline.clear(); } catch(e){}
+    document.documentElement.classList.remove('gsap');
+    document.querySelectorAll('[style]').forEach(el => {
+      if (el.closest('.sec-head,.about-grid,.cloud-banner,.cert-grid,.proj-grid,.contact-grid')) el.removeAttribute('style');
+    });
+    document.querySelectorAll('.sec-head,.about-text,.panel,.cloud-banner,.cert,.proj,.contact-intro,.contact-grid > div')
+      .forEach(el => el.classList.add('reveal'));
+    legacyMotion();
+  }
+} else {
+  legacyMotion();
+}
 
 /* cursor glow on project cards */
 document.querySelectorAll('.proj').forEach(card => {
